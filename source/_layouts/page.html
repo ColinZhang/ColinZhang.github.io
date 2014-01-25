@@ -4,13 +4,14 @@ layout: default
 
 <div>
     <article role="article">
+        <!--title-->
         {% if page.title %}
         <header>
             <h1 class="entry-title">
                 {% if site.titlecase %}
-                {{ page.title | titlecase }}
+                    {{ page.title | titlecase }}
                 {% else %}
-                {{ page.title }}
+                    {{ page.title }}
                 {% endif %}
             </h1>
             {% if page.date %}
@@ -27,31 +28,31 @@ layout: default
         <footer>
             {% if page.date or page.author %}
             <p class="meta">
-                {% if page.author %}
-                {% include post/author.html %}
-                {% endif %}
+                <!-- author -->
+                {% if page.author %}{% include post/author.html %}{% endif %}
 
                 {% include post/date.html %}
 
                 {% if updated %}
-                {{ updated }}
+                    {{ updated }}
                 {% else %}
-                {{ time }}
+                    {{ time }}
                 {% endif %}
 
-                {% if page.categories %}
-                {% include post/categories.html %}
-                {% endif %}
+                <!--categories-->
+                {% if page.categories %}{% include post/categories.html %}{% endif %}
             </p>
             {% endif %}
 
+            <!--sharing-->
             {% unless page.sharing == false %}
-            {% include post/sharing.html %}
+                {% include post/sharing.html %}
             {% endunless %}
         </footer>
         {% endunless %}
     </article>
 
+    <!--comments-->
     {% if site.disqus_short_name and page.comments == true %}
     <section>
         <h1>Comments</h1>
@@ -63,9 +64,9 @@ layout: default
 {% unless page.sidebar == false %}
 <aside class="sidebar">
     {% if site.page_asides.size %}
-    {% include_array page_asides %}
+        {% include_array page_asides %}
     {% else %}
-    {% include_array default_asides %}
+        {% include_array default_asides %}
     {% endif %}
 </aside>
 {% endunless %}
