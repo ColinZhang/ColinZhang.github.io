@@ -6,3 +6,8 @@ comments: true
 sharing: true
 footer: true
 ---
+About Me
+===========
+Colin Zhang
+
+Colin.Zhang1992@gmail.com
