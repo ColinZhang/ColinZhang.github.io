@@ -3,8 +3,8 @@
 # ----------------------- #
 
 url: http://ColinZhang.github.io
-title: Colin Key to life
-subtitle: My Blog.
+title: "Colin's Key to life"
+subtitle: hello world.
 author: Colin Zhang
 simple_search: http://google.com/search
 description: Hello world.
@@ -39,6 +39,7 @@ rdiscount:
     - autolink
     - footnotes
     - smart
+
 pygments: false # default python pygments have been replaced by pygments.rb
 
 paginate: 10          # Posts per page on the blog index
