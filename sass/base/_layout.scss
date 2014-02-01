@@ -1,4 +1,4 @@
-$max-width: 800px !default;
+$max-width: 1000px !default;
 
 // Padding used for layout margins
 $pad-min: 18px !default;
@@ -18,29 +18,8 @@ $header-font-size: 1em !default;
 $header-padding-top: 1.5em !default;
 $header-padding-bottom: 1.5em !default;
 
-.group { @include pie-clearfix; }
-
-@mixin collapse-sidebar {
-  float: none;
-  width: auto;
-  clear: left;
-  margin: 0;
-  padding: 0 $pad-medium 1px;
-  background-color: lighten($sidebar-bg, 2);
-  border-top: 1px solid lighten($sidebar-border, 4);
-  section {
-    &.odd, &.even { float: left; width: 48%; }
-    &.odd { margin-left: 0; }
-    &.even { margin-left: 4%; }
-  }
-  &.thirds section {
-    width: 30%;
-    margin-left: 5%;
-    &.first {
-      margin-left: 0;
-      clear: both;
-    }
-  }
+.group {
+    @include pie-clearfix;
 }
 
 body {
@@ -113,6 +92,29 @@ aside.sidebar {
 
 .toggle-sidebar { &, .no-sidebar & { display: none; }}
 
+@mixin collapse-sidebar {
+  float: none;
+  width: auto;
+  clear: left;
+  margin: 0;
+  padding: 0 $pad-medium 1px;
+  background-color: lighten($sidebar-bg, 2);
+  border-top: 1px solid lighten($sidebar-border, 4);
+  section {
+    &.odd, &.even { float: left; width: 48%; }
+    &.odd { margin-left: 0; }
+    &.even { margin-left: 4%; }
+  }
+  &.thirds section {
+    width: 30%;
+    margin-left: 5%;
+    &.first {
+      margin-left: 0;
+      clear: both;
+    }
+  }
+}
+
 body.sidebar-footer {
   @media only screen and (min-width: 750px) {
     aside.sidebar{ @include collapse-sidebar; }
@@ -124,12 +126,15 @@ body.sidebar-footer {
 @media only screen and (min-width: 550px) {
   body > header { font-size: $header-font-size; }
 }
+
 @media only screen and (min-width: 750px) {
   aside.sidebar { @include collapse-sidebar; }
 }
+
 #main, #content, .sidebar {
   @extend .group;
 }
+
 @media only screen and (min-width: 768px) {
   body { -webkit-text-size-adjust: auto; }
   body > header { font-size: $header-font-size * 1.2; }
