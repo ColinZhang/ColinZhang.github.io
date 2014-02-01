@@ -2,65 +2,57 @@
 layout: default
 ---
 
+{% if page.title %}
+{% capture title %}
+  {% if site.titlecase %}{{ page.title | titlecase }}
+  {% else %}{{ page.title }}
+  {% endif %}
+{% endcapture%}
+{% endif %}
+
 <div>
-    <article role="article">
-        <!--title-->
-        {% if page.title %}
-        <header>
-            <h1 class="entry-title">
-                {% if site.titlecase %}
-                    {{ page.title | titlecase }}
-                {% else %}
-                    {{ page.title }}
-                {% endif %}
-            </h1>
-            {% if page.date %}
-            <p class="meta">{% include post/date.html %}{{ time }}</p>
-            {% endif %}
-        </header>
-        {% endif %}
-
-        <!--content goes here-->
-        {{ content }}
-
-        <!--footer-->
-        {% unless page.footer == false %}
-        <footer>
-            {% if page.date or page.author %}
-            <p class="meta">
-                <!-- author -->
-                {% if page.author %}{% include post/author.html %}{% endif %}
-
-                {% include post/date.html %}
-
-                {% if updated %}
-                    {{ updated }}
-                {% else %}
-                    {{ time }}
-                {% endif %}
-
-                <!--categories-->
-                {% if page.categories %}{% include post/categories.html %}{% endif %}
-            </p>
-            {% endif %}
-
-            <!--sharing-->
-            {% unless page.sharing == false %}
-                {% include post/sharing.html %}
-            {% endunless %}
-        </footer>
-        {% endunless %}
-    </article>
-
-    <!--comments-->
-    {% if site.disqus_short_name and page.comments == true %}
-    <section>
-        <h1>Comments</h1>
-        <div id="disqus_thread" aria-live="polite">{% include post/disqus_thread.html %}</div>
-    </section>
+  <article role="article">
+    <!--title-->
+    {% if page.title %}
+      <header>
+        <h1 class="entry-title">{{ title }}</h1>
+          {% if page.date %}<p class="meta">{% include post/date.html %}{{ time }}</p>{% endif %}
+      </header>
     {% endif %}
+
+    <!--content goes here-->
+    {{ content }}
+
+    <!--footer-->
+    {% unless page.footer == false %}
+    <footer>
+      <!-- metadata -->
+      {% if page.date or page.author %}
+        <p class="meta">
+          {% if page.author %}{% include post/author.html %}{% endif %}
+          {% include post/date.html %}{% if updated %}{{ updated }}{% else %}{{ time }}{% endif %}
+          {% if page.categories %}{% include post/categories.html %}{% endif %}
+        </p>
+      {% endif %}
+
+      <!-- sharing -->
+      {% unless page.sharing == false %}
+        {% include post/sharing.html %}
+      {% endunless %}
+    </footer>
+    {% endunless %}
+  </article>
+
+  <!--comments-->
+  {% if site.disqus_short_name and page.comments == true %}
+  <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite">{% include post/disqus_thread.html %}</div>
+  </section>
+  {% endif %}
 </div>
 
+<!-- aside -->
 {% unless page.sidebar == false %}
 <aside class="sidebar">
     {% if site.page_asides.size %}
