@@ -1,3 +1,4 @@
+# compass main configuration file
 require 'sass-globbing'
 
 # Require any additional compass plugins here.
