@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://colins-key.herokuapp.com/sitemap.xml 

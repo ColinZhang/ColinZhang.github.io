@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Shell | Colin's Key]]></title>
+  <link href="http://colins-key.herokuapp.com/blog/categories/shell/atom.xml" rel="self"/>
+  <link href="http://colins-key.herokuapp.com/"/>
+  <updated>2014-04-10T21:00:06+08:00</updated>
+  <id>http://colins-key.herokuapp.com/</id>
+  <author>
+    <name><![CDATA[Fan Zhang]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Quotation Concept in Unix Shell]]></title>
+    <link href="http://colins-key.herokuapp.com/blog/2014/02/14/quotation-in-Unix-shell/"/>
+    <updated>2014-02-14T00:00:00+08:00</updated>
+    <id>http://colins-key.herokuapp.com/blog/2014/02/14/quotation-in-Unix-shell</id>
+    <content type="html"><![CDATA[<p>The basic actions of the shell are simple. It reads a line. This is
+either from a file, a script, or from a user.</p>
+
+<ul>
+<li>First, meta-characters are &ldquo;handled.&rdquo;</li>
+<li>Second, the name of the executable is found.</li>
+<li>Third, the arguments are passed to the program.</li>
+<li>Fourth, the file redirection is setup.</li>
+<li>Lastly, the program is executed.</li>
+</ul>
+
+
+<h2>Meta-characters and Filename expansion</h2>
+
+<p>This includes <strong>variable evaluation</strong> (variables start with a <code>$</code>), and
+<strong>filename expansion</strong>.</p>
+
+<h2>Quotation</h2>
+
+<p>Why quote at all, and what do I mean by quoting? Well, the shell
+understands many special characters, called <code>meta-characters</code>. These
+each have a purpose, and there are so many, beginners often suffer from
+meta-itis. Example: The dollar sign(<code>$</code>) is a meta-character, and tells
+the shell the next word is a variable. If you wanted to use the dollar
+sign as a regular character, how can you tell the shell the dollar sign
+does not indicate a variable? Answer: the dollar sign must be
+<strong>quoted</strong>. Why? <strong>Quoted characters do not have a special meaning.</strong></p>
+
+<blockquote><p>Quoted characters do not have a special meaning.</p></blockquote>
+
+<p>A surprising number of characters have special meanings. The lowly
+space, often forgotten in many books, is an extremely important
+meta-character. Consider the following</p>
+
+<p><code>sh
+rm -i file1 file2
+</code></p>
+
+<p>The shell breaks this line up to four words, which can be logically
+divided into two classes.</p>
+
+<ol>
+<li><code>rm</code> is program to execute</li>
+<li><code>-i</code>, <code>file1</code>, <code>file2</code> are parameters or arguments, which will be
+passed to <code>rm</code> before it runs.</li>
+</ol>
+
+
+<p>To shell, there is no difference between <code>-i</code> and <code>file1</code>, except that
+it follows convention that options begin with a hyphen, like <code>-i</code>. All
+shell cares is to extract four words from the line, then find the
+executable <code>rm</code> and pass the other three parameters to it. However, when
+you input the quoted version, it will be another story</p>
+
+<p><code>sh
+rm -i 'file1 file2'
+</code></p>
+
+<p>Note that, &ldquo;quoted characters do not have a special meaning&rdquo; , so does
+the space between &lsquo;file1&rsquo; and &lsquo;file2&rsquo;. DO NOT perceive &lsquo;file1 file2&rsquo; as
+a string in C or any other programming languages. <strong>There is no concept
+of C-like string in shell</strong> and don&rsquo;t even try to make the metaphor,
+which is often overlooked by beginners yet extremely important to keep
+in mind, in order to understand quotation correctly.</p>
+
+<p>A more accurate description of the quoting is a <strong>switch</strong>, or toggle &mdash;
+it turns on and off the quotation status whether the meta-characters
+within text are getting to be interpreted. Therefore, following
+variations are all equivalent</p>
+
+<p><code>sh
+rm 'file1 file2'
+rm file1' 'file2
+rm f'ile1 file'2
+</code></p>
+
+<p>Just remember: There is NO concept of string in shell at all.</p>
+
+<h2>Strong versus weak quoting</h2>
+
+<p>Simple enough,</p>
+
+<ul>
+<li><code>"</code> is weakest: backslash(<code>\</code>), dollar sign(<code>$</code>), and the
+back-stick(``) all keep effective inside the double quotation.</li>
+<li><code>'</code> is strongest: single quotation returns everything inside the
+quotation literally.</li>
+</ul>
+
+
+<h2>Nested quotation</h2>
+
+<p>Once you have fully understood that The quotation marks in the Bourne
+shell are not used to define a string, but to <strong>disable</strong> or <strong>enable</strong>
+interpretation of meta-characters, it&rsquo;s easy and intuitive to play with
+so called &lsquo;nested quotation&rsquo;</p>
+
+<p><code>sh
+$ echo 'Strong quotes use '"'"' and weak quotes use "'
+Strong quotes use ' and weak quotes use "
+</code></p>
+
+<p>Above example tells all story about nested quotation. Equivalently</p>
+
+<p><code>sh
+$ echo '"'"'"
+</code></p>
+
+<p>simply gives <code>"'</code>.</p>
+
+<h2>some tricky cases</h2>
+
+<p>There are always chances for you to use nested quotation in composing a
+program. What makes it tricky is that the order of quotation matters,
+let&rsquo;s look at something live</p>
+
+<p><code>sh
+$perl -e "print('hello world')"
+hello world$
+</code></p>
+
+<p>Printing hello world as we excepted, but Where is the \$ from? No magic,
+it is the beginning of the next line, because the absence of
+<code>line switch</code> at the tail of &lsquo;hello world&rsquo;. I thought following will be
+fine</p>
+
+<p><code>sh
+$perl -e "print('hello world\n')"
+hello world\n$
+</code></p>
+
+<p>But it isn&rsquo;t. Single quotation scapes &lsquo;n&rsquo; as Perl string syntax
+specified (NOTE, n is an escape chatachter defined by programing
+language, which has nothing to do with quotation in shell). In this
+cases, following is the way to set it right</p>
+
+<p><code>sh
+$perl -e 'print("hello world\n")'
+hello world
+</code></p>
+
+<p>Another question worthy of thinking is, will
+<code>perl -e print("hello world\n")</code> works? Now that <code>'a'</code> has no difference
+with <code>a</code> to shell, why <code>'print("hello world\n")'</code> works while
+<code>print("hello world\n")</code> doesn&rsquo;t? Here is the result</p>
+
+<p><code>sh
+$perl -e print("hello world\n")
+Unknown file attribute.
+</code></p>
+
+<h3>What&rsquo;s next</h3>
+
+<p>I&rsquo;m planning to write something about <strong>escape character versus
+quotation</strong> later.</p>
+]]></content>
+  </entry>
+  
+</feed>

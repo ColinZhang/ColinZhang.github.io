@@ -1,0 +1,1234 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+    Colin's Key
+    </title>
+  <meta name="author" content="Fan Zhang">
+
+  
+  <meta name="description" content="Description from NVD The (1) TLS and (2) DTLS implementations in OpenSSL 1.0.1 before 1.0.1g do not properly handle Heartbeat Extension packets, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://colins-key.herokuapp.com/blog">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Colin's Key" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Arvo:400,700' rel='stylesheet' type='text/css'>
+
+<script src="/javascripts/main.js"></script>
+<script src="/javascripts/jquery.classysocial.js"></script>
+
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Colin's Key</a></h1>
+  
+    <h2>Go with your instinct, with your first instinct</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:colins-key.herokuapp.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Start</a></li>
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <!--for blog/index-->
+      <h1 class="entry-title"><a href="/blog/2014/04/10/cve-2014-0160/">CVE-2014-0160</a></h1>
+    
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-10T17:16:30+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Description from NVD</h2>
+
+<p>The (1) <code>TLS</code> and (2) <code>DTLS</code> implementations in <code>OpenSSL 1.0.1</code> before <code>1.0.1g</code> do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information from process memory via crafted packets that trigger a buffer over-read, as demonstrated by reading private keys, related to <code>d1_both.c</code> and <code>t1_lib.c</code>, aka the Heartbleed bug.</p>
+
+<p><a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0160">To NVD</a></p>
+
+<h2>Heartbeat Extension</h2>
+
+<p>The <strong>Heartbeat Extension</strong> is a new feature augmented for the Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) protocols. Basically the Heartbeat Extension is designed to provide a faster and light-weight keeping-alive mechanism, and DTLS protocol can use it to perform path MTU (PMTU) discovery as well.</p>
+
+<p>Generally speaking, the Heartbeat Extension works in a quite simple way, in which the client sends out a <code>HeartbeatRequest</code> message and the server respond it with an exact copy of payload to indicate that <em>I&rsquo;m not only alive but conscious.</em> Of course all messages changed in this routine is on the top of TLS layer. (Presisely speaking, the Heartbeat protocol is a new protocol running on top of the Record Layer.)</p>
+
+<p><a href="https://tools.ietf.org/html/rfc6520">To RFC6520</a></p>
+
+<h2>Messages</h2>
+
+<p>According to RFC6520, the HB protocol message consists of their type, attached payload and padding.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">HeartbeatMessageType</span> <span class="n">type</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">uint16</span> <span class="n">payload_length</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">opaque</span> <span class="n">payload</span><span class="p">[</span><span class="n">HeartbeatMessage</span><span class="p">.</span><span class="n">payload_length</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">opaque</span> <span class="n">padding</span><span class="p">[</span><span class="n">padding_length</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span> <span class="n">HeartbeatMessage</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Though the description in RFC is fairly clear and concise, I&rsquo;d like to summarize several important and tangent facts for understanding CVE-2014-0160,</p>
+
+<ul>
+<li>According to the RFC, The length of the <code>type</code> field is 1 byte, and the length of the <code>payload_length</code> is 2.</li>
+<li>Padding can not be too large: The length of a HeartbeatMessage is <code>TLSPlaintext.length</code> for TLS and <code>DTLSPlaintext.length</code> for DTLS. (decided through peer negotiation, default is 2<sup>14</sup> Bytes(octets))</li>
+<li>Nor can padding be too tiny: The <code>padding_length</code> MUST be at least 16.</li>
+</ul>
+
+
+<h2>Hits</h2>
+
+<p>See what will happen if we send this crafted HeartbeatRequest messages to the vulnerable server,</p>
+
+<p><a href="http://en.wikipedia.org/wiki/Transport_Layer_Security">Wikipedia</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>18 03 02 00 03 01 40 00
+</span><span class='line'>
+</span><span class='line'>18   : Content type::Heartbeat
+</span><span class='line'>0302 : Major Version=3, Minor Version=2, indicates TLS 1.1
+</span><span class='line'>0003 : Length = 3
+</span><span class='line'>01   : TLS1_HB_REQUEST
+</span><span class='line'>4000 : 0x4000=2^14=16384, indicates 64-byte length of payload
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span>
+</span><span class='line'><span class="nf">tls1_process_heartbeat</span><span class="p">(</span><span class="n">SSL</span> <span class="o">*</span><span class="n">s</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">s3</span><span class="o">-&gt;</span><span class="n">rrec</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">pl</span><span class="p">;</span>   <span class="c1">// (1) p points to packet</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">hbtype</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">payload</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">padding</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span> <span class="cm">/* Use minimum padding */</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/* Read type and payload length first */</span>
+</span><span class='line'>    <span class="n">hbtype</span> <span class="o">=</span> <span class="o">*</span><span class="n">p</span><span class="o">++</span><span class="p">;</span>        <span class="c1">// (2) p gets advanced to point to `payload_length`</span>
+</span><span class='line'>    <span class="n">n2s</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">payload</span><span class="p">);</span>      <span class="c1">// (3) payload = n2s(*p), p+=2</span>
+</span><span class='line'>    <span class="n">pl</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>               <span class="c1">// (4) p and pl points to payload</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">msg_callback</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">s</span><span class="o">-&gt;</span><span class="n">msg_callback</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">version</span><span class="p">,</span> <span class="n">TLS1_RT_HEARTBEAT</span><span class="p">,</span>
+</span><span class='line'>            <span class="o">&amp;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">s3</span><span class="o">-&gt;</span><span class="n">rrec</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">s3</span><span class="o">-&gt;</span><span class="n">rrec</span><span class="p">.</span><span class="n">length</span><span class="p">,</span>
+</span><span class='line'>            <span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">msg_callback_arg</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">hbtype</span> <span class="o">==</span> <span class="n">TLS1_HB_REQUEST</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>        <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">buffer</span><span class="p">,</span> <span class="o">*</span><span class="n">bp</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">buffer</span> <span class="o">=</span> <span class="n">OPENSSL_malloc</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">payload</span> <span class="o">+</span> <span class="n">padding</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">bp</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">;</span>      <span class="c1">// (1) bp points to buffer</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/* Enter response type, length and copy payload */</span>
+</span><span class='line'>        <span class="o">*</span><span class="n">bp</span><span class="o">++</span> <span class="o">=</span> <span class="n">TLS1_HB_RESPONSE</span><span class="p">;</span>    <span class="c1">// (2) 1st byte: TYPE</span>
+</span><span class='line'>        <span class="n">s2n</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">bp</span><span class="p">);</span>            <span class="c1">// (3) 2-3 byte: payload_length</span>
+</span><span class='line'>        <span class="n">memcpy</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">pl</span><span class="p">,</span> <span class="n">payload</span><span class="p">);</span>     <span class="c1">// (*) payload Bytes of secret copied **</span>
+</span><span class='line'>        <span class="n">bp</span> <span class="o">+=</span> <span class="n">payload</span><span class="p">;</span>
+</span><span class='line'>        <span class="cm">/* Random padding */</span>
+</span><span class='line'>        <span class="n">RAND_pseudo_bytes</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">padding</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//... all secrets get sent to client ...</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h2>Fix</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gh">diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c</span>
+</span><span class='line'><span class="gh">index b82fada..bddffd9 100644 (file)</span>
+</span><span class='line'><span class="gd">--- a/ssl/t1_lib.c</span>
+</span><span class='line'><span class="gi">+++ b/ssl/t1_lib.c</span>
+</span><span class='line'><span class="gu">@@ -2588,16 +2588,20 @@ tls1_process_heartbeat(SSL *s)</span>
+</span><span class='line'>        unsigned int payload;
+</span><span class='line'>        unsigned int padding = 16; /* Use minimum padding */
+</span><span class='line'>
+</span><span class='line'><span class="gd">-       /* Read type and payload length first */</span>
+</span><span class='line'><span class="gd">-       hbtype = *p++;</span>
+</span><span class='line'><span class="gd">-       n2s(p, payload);</span>
+</span><span class='line'><span class="gd">-       pl = p;</span>
+</span><span class='line'><span class="gd">-</span>
+</span><span class='line'>        if (s-&gt;msg_callback)
+</span><span class='line'>                s-&gt;msg_callback(0, s-&gt;version, TLS1_RT_HEARTBEAT,
+</span><span class='line'>                        &amp;s-&gt;s3-&gt;rrec.data[0], s-&gt;s3-&gt;rrec.length,
+</span><span class='line'>                        s, s-&gt;msg_callback_arg);
+</span><span class='line'>
+</span><span class='line'><span class="gi">+       /* Read type and payload length first */</span>
+</span><span class='line'><span class="gi">+       if (1 + 2 + 16 &gt; s-&gt;s3-&gt;rrec.length)</span>
+</span><span class='line'><span class="gi">+               return 0; /* silently discard */</span>
+</span><span class='line'><span class="gi">+       hbtype = *p++;</span>
+</span><span class='line'><span class="gi">+       n2s(p, payload);</span>
+</span><span class='line'><span class="gi">+       if (1 + 2 + payload + 16 &gt; s-&gt;s3-&gt;rrec.length)</span>
+</span><span class='line'><span class="gi">+               return 0; /* silently discard per RFC 6520 sec. 4 */</span>
+</span><span class='line'><span class="gi">+       pl = p;</span>
+</span><span class='line'><span class="gi">+</span>
+</span><span class='line'>        if (hbtype == TLS1_HB_REQUEST)
+</span><span class='line'>                {
+</span><span class='line'>                unsigned char *buffer, *bp;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!--for blog/index-->
+      <h1 class="entry-title"><a href="/blog/2014/03/15/all-about-OOP-in-Python-Part-II/">Python: Magic Methods</a></h1>
+    
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-15T22:00:00+08:00" pubdate data-updated="true">Mar 15<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This post is second part of my <strong>Python OOP</strong> serials, talking about <em>comon magic methods</em> in Python.</p>
+
+<h2>Index and slice: <code>__getitem__</code> and <code>__setitem__</code></h2>
+
+<p><code>__getitem__</code>: After a class defines this method, index operation on its instance will invoke <code>__getitem__</code>. That is, <code>X[i]</code> will be process as <code>X.__getitem__(i)</code> by Python (Further, as <code>class.__getitem__(X, i)__</code>).</p>
+
+<h3>capture slicing</h3>
+
+<p>Besides index, slicing operation also invokes <code>__getitem__</code>. Formally, that is the way how built-in types to process slicing.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">L</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">L</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</span><span class='line'><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What realling happens behind the scene is,</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">L</span><span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span> <span class="c"># 1</span>
+</span><span class='line'><span class="n">__getitem__</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span> <span class="c"># 2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Iteration by indexing</h2>
+
+<p><code>For</code> loop invokes <code>__getitem__</code> each time a iteration, with an automatic increasing <em>index</em>. Therefore, the situation is: any object that can response to index operation is able to respond iteration, in the similar way.</p>
+
+<p>Actually, many other operations will trigger `<strong>getitem</strong> as well, many of which are quite intuitive &mdash; they all have a sense of looping over a sequence, such as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="s">&#39;p&#39;</span> <span class="ow">in</span> <span class="n">X</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">X</span> <span class="p">]</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">=</span> <span class="n">X</span> <span class="c"># sequence assignment</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The context where these operations happen is called <strong>interation environment</strong>.</p>
+
+<h2>Interation: <code>__iter__</code> and <code>__next___</code></h2>
+
+<p>Although <code>__getitem__</code> is a effective way to implement iteration, Python would perfer to try <code>__iter__</code> first, and then <code>__getitem__</code> if the former fails to exist.</p>
+
+<p>Technically speaking, <code>__iter__</code> method should return a iterator object, which provides a <code>__next__</code> method to access next object of the iteration sequence. Python keeps invoking <code>__next__</code> method until <code>StopIteration</code> exception raises.</p>
+
+<h2>Membership: <code>__contains__</code>, <code>__iter__</code> and <code>__getitem__</code></h2>
+
+<p>Note that <em>operation overriding happens at multiple leaels</em>, which means in order to fulfill a certain objective, class can choose to provide either a specific and dedicate method or a second-class but more general plan B.</p>
+
+<p>For example, membership operation can be implemented as anyone of <code>___getitem__</code>, <code>__iter__</code> and <code>__contains__</code>. But the priority is in reverse order: <code>__getitem__</code> can works, but <code>__contains__</code> is more suitable and dedicate.</p>
+
+<h2>Attribute: <code>__getattr__</code> and <code>__setattr__</code></h2>
+
+<ul>
+<li><code>__getattr__</code>, <code>X.undefined</code></li>
+<li><code>__getattribute__</code>, all <code>X.attr</code></li>
+<li><code>__setattr__</code>, <code>X.attr = val</code></li>
+</ul>
+
+
+<p>Note that: any assignment to <code>self.attr</code> in <code>__setattr__</code> will cause dead loop and ending in a crash. Correct way is to manipulate attributes via <code>__dict__</code>.</p>
+
+<p>Other attribution management tools to be cover later:</p>
+
+<ul>
+<li><code>__getattribute__</code></li>
+<li><code>Property</code> built-in function</li>
+<li>Descriptor protocol and <code>__get__</code>, <code>__set___</code></li>
+</ul>
+
+
+<h3>Simulate privacy: part I</h3>
+
+<p>Python didnt provide a <code>private</code> statement, which means a class cannot hold its own private data immune from outside modification. Thanks to <code>__setattr__</code>, however, we can sitimulate this behavior by overwriting <code>__setattr__</code>.</p>
+
+<h2><code>__repr__</code> and <code>__str__</code></h2>
+
+<h2>Right side and Round side addition</h2>
+
+<h2><code>__call__</code></h2>
+
+<p>When a instance gets invoked, <code>__call__</code> method will be invoked. <code>__call__</code> provides effective way to implement so called <em>bound method</em>. Actually, <code>__calll__</code> might be the best way to store state information in Python, because <code>__call__</code> allows us to attach inner information to a callable object.</p>
+
+<h2>Comparision: <code>__lt__</code>, <code>__gt__</code> and others</h2>
+
+<h2><code>__bool__</code> and <code>__len__</code></h2>
+
+<h2>descructor: <code>__del__</code></h2>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!--for blog/index-->
+      <h1 class="entry-title"><a href="/blog/2014/03/14/all-about-python-oop-parti/">Python: Class</a></h1>
+    
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-14T13:57:07+08:00" pubdate data-updated="true">Mar 14<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This post is first part of my <strong>Python OOP</strong> serials, talking about <em>Class, inheritance</em> and <em>Naming space</em> in Python.</p>
+
+<h2>类(class)</h2>
+
+<h3>语句</h3>
+
+<ol>
+<li>与C++不同，Python的<code>class</code>并不是声明式的。和<code>def</code> 一样，<code>class</code>语句是
+对象的创建者，并且是一个隐含的赋值语句。</li>
+<li>和 <code>def</code> 一样，<code>class</code> 语句也是真正的可执行代码。</li>
+</ol>
+
+
+<h3>命名空间</h3>
+
+<p>从类得到命令空间的过程如下：Python执行<code>class</code>语句时，会从头至尾执行其中的所有语句。
+在这个过程中，赋值运算会在这个类作用域中创建变量名，从而成为对应的类对象的属性。
+就像模块和函数：</p>
+
+<ol>
+<li>和函数一样，<code>class</code>语句是本地作用域，由内嵌的赋值语句建立的变量名就存在于这个本地
+作用域中</li>
+<li>和模块内的变量名一样，在 <code>class</code> 内的赋值的变量名会变成类对象中的属性。</li>
+<li>不同之处在于，类是可以继承的。在类或实例对象中找不到的属性就会从其他类中获取。</li>
+</ol>
+
+
+<p>继承搜索只会在<strong>引用</strong>时发生，而不会在赋值时发生。 <code>x.attr</code> 会通过继承在类中查找，
+而 <code>y.attr=foo</code> 则会在 <code>y</code> 中创建 <code>y.attr</code>.</p>
+
+<h3>方法</h3>
+
+<p>从程序设计的角度来看，方法的工作方式与简单函数完全一致，只有一个重要差异：
+方法的第一个参数总是接收方法调用的隐形主体（实例对象， <code>self</code> ）。
+因此，下面两种调用方法的方式是完全一样的（而且Python就是这样处理方法调用的）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">instance</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">args</span><span class="o">...</span><span class="p">)</span> <span class="c"># 1</span>
+</span><span class='line'><span class="n">class</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">args</span><span class="o">...</span><span class="p">)</span> <span class="c"># 2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(1)的方法调用会被翻译成(2)的形式，然后class通过继承搜索机制找到method的所在位置。</p>
+
+<h3>其他可能</h3>
+
+<p>静态方法和类方法。</p>
+
+<h2>继承</h2>
+
+<p>每次使用 <code>object.attr</code> 时都会发生<strong>继承</strong>：Python会从头至尾搜索命名空间树，
+先从<strong>对象</strong>开始，寻找所能找到的第一个 <code>attr</code> 。在方法中引用 <code>self.foo</code>
+也会触发继承。树中较低的定义会覆盖较高的定义，继承构成了专有化的基础。</p>
+
+<pre><code>［Super Class］  [Super Class]
+       \               /
+        \             /
+       +--------------+
+       |     class    |
+       +--------------+
+               ^
+               |
+       +--------------+
+       |   instance   |
+       +--------------+
+</code></pre>
+
+<h3>ABC</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># abc.py</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Super</span><span class="p">:</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">delegate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>      <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">()</span>
+</span><span class='line'>      
+</span><span class='line'><span class="k">class</span> <span class="nc">Provider</span><span class="p">(</span><span class="n">Super</span><span class="p">):</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>      <span class="k">print</span><span class="p">(</span><span class="s">&#39;in Provider.action&#39;</span><span class="p">)</span>
+</span><span class='line'>      
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">x</span> <span class="o">=</span> <span class="n">Provider</span><span class="p">()</span>
+</span><span class='line'>  <span class="n">x</span><span class="o">.</span><span class="n">delegate</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>&gt;&gt;&gt; ./abc.py
+</span><span class='line'>&gt;&gt;&gt; in Provider.action
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当调用 <code>x.delegate()</code>  时，有两个独立的继承搜索会发生：</p>
+
+<ol>
+<li><p>在 <code>x.delegate()</code> 调用中，Python会在继承树中发现，
+<code>delegate</code> 方法在 <code>Super</code> 类中，实例 <code>x</code> 会传给这个方法的 <code>self</code> 参数。</p></li>
+<li><p><code>Super.delegate()</code>  中， <code>self.action()</code>  会对 <code>self</code> 以及其上层的对象进行查找，
+因为这里 <code>self</code> 就是 <code>Provider</code> 实例，所以 <code>self.action()</code> 会
+调用   <code>Provider.action()</code>  。</p></li>
+</ol>
+
+
+<h2>命名空间全貌</h2>
+
+<h3>规则</h3>
+
+<h4>简单变量名</h4>
+
+<ul>
+<li><p>Assignment(  <code>X=value</code> )
+  Makes names <strong>local</strong>: creates or changes the name X in the current local scope, unless declared global.</p></li>
+<li><p>Reference (  <code>X</code> )
+  Looks for the name X in the current local scope, then any and all <strong>enclosing functions[?]</strong>, then the current global scope, then the <strong>built-in scope[?]</strong>.</p></li>
+</ul>
+
+
+<h4>属性名称</h4>
+
+<ul>
+<li><p>Assignment (  <code>object.X = value</code> )
+  Creates or alters the attribute name X in the namespace of the object being qualified, and none other. Inheritance-tree climbing happens only on attribute reference, not on attribute assignment.</p></li>
+<li><p>Reference (  <code>object.X</code> )
+ For <strong>class-based</strong> objects, searches for the attribute name X in object, then in all accessible classes above it, using the <em>inheritance search procedure</em>. For <strong>nonclass</strong> objects such as modules, fetches X from object <em>directly</em>.</p></li>
+</ul>
+
+
+<h3>例子</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># manynames.py</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">X</span> <span class="o">=</span> <span class="mi">11</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">g</span><span class="p">():</span>
+</span><span class='line'>  <span class="n">X</span> <span class="o">=</span> <span class="mi">22</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">C</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">X</span> <span class="o">=</span> <span class="mi">33</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>      <span class="n">X</span> <span class="o">=</span> <span class="mi">44</span>
+</span><span class='line'>      <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="mi">55</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>        <span class="c"># 11</span>
+</span><span class='line'>  <span class="n">f</span><span class="p">()</span>             <span class="c"># 11</span>
+</span><span class='line'>  <span class="n">g</span><span class="p">()</span>             <span class="c"># 22</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>        <span class="c"># 11</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">obj</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>    <span class="c"># 33</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">obj</span><span class="o">.</span><span class="n">m</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>    <span class="c"># 55</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>      <span class="c"># 33</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In another file,</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># otherfiles.py</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">manynames</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">X</span> <span class="o">=</span> <span class="mi">66</span>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>             <span class="c"># 66</span>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">manynames</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>   <span class="c"># 11</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">manynames</span><span class="o">.</span><span class="n">f</span><span class="p">()</span>        <span class="c"># 11</span>
+</span><span class='line'><span class="n">manynames</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>        <span class="c"># 22</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">manynames</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="c"># 33</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">I</span> <span class="o">=</span> <span class="n">manynames</span><span class="o">.</span><span class="n">C</span><span class="p">()</span>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">I</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>           <span class="c"># 33</span>
+</span><span class='line'><span class="n">I</span><span class="o">.</span><span class="n">m</span><span class="p">()</span>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">I</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>           <span class="c"># 55</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>命名空间的字典</h3>
+
+<p>模块的命名空间实际上是以<strong>字典</strong>(  <code>__dict__</code> )的形式出现的，
+类和实例对象也是如此：属性点号运算其实内部就是字典，而继承属性其实就是搜索链接的字典而已。</p>
+
+<p>如果attr是x的实例属性，则有两种方式可以对其读取和赋值。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">x</span><span class="o">.</span><span class="n">attr</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s">&#39;attr&#39;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是，  <code>x.attr</code> 会触发继承搜索，而 <code>x.__dict__</code> 只包括了<strong>实例</strong>上的属性。</p>
+
+<h3>命名空间的链接</h3>
+
+<p>参考如下的爬树程序</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># classtree.py</span>
+</span><span class='line'><span class="sd">&quot;&quot;&quot;</span>
+</span><span class='line'><span class="sd">Climb inheritance trees using namespace links,</span>
+</span><span class='line'><span class="sd">displaying higher superclasses with indentation.</span>
+</span><span class='line'><span class="sd">&quot;&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">classtree</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">indent</span><span class="p">):</span>
+</span><span class='line'>  <span class="k">print</span><span class="p">(</span><span class="s">&#39;.&#39;</span> <span class="o">*</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">supercls</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">__bases__</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">classtree</span><span class="p">(</span><span class="n">supercls</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">selftest</span><span class="p">():</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">A</span><span class="p">:</span>        <span class="k">pass</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>     <span class="k">pass</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>     <span class="k">pass</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">D</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">):</span>   <span class="k">pass</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">E</span><span class="p">:</span>        <span class="k">pass</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">F</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">):</span>   <span class="k">pass</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">print</span> <span class="s">&quot;Tree of </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">F</span>
+</span><span class='line'>  <span class="n">classtree</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">selftest</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出结果如下</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">Tree</span> <span class="n">of</span> <span class="n">__main__</span><span class="o">.</span><span class="n">F</span>
+</span><span class='line'><span class="n">F</span>
+</span><span class='line'><span class="o">...</span><span class="n">D</span>
+</span><span class='line'><span class="o">......</span><span class="n">B</span>
+</span><span class='line'><span class="o">.........</span><span class="n">A</span>
+</span><span class='line'><span class="o">......</span><span class="n">C</span>
+</span><span class='line'><span class="o">.........</span><span class="n">A</span>
+</span><span class='line'><span class="o">...</span><span class="n">E</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!--for blog/index-->
+      <h1 class="entry-title"><a href="/blog/2014/03/12/python-descriptor-by-live-example/">Python Descriptor by Live Example</a></h1>
+    
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-12T00:00:00+08:00" pubdate data-updated="true">Mar 12<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When browsing the source code of OSQA, I accidentally dipped into Django&rsquo;s implementation of <code>AuthenticationMiddleware</code>, a middleware to attach a <code>user</code> instance to each <code>request</code> when hooked from <code>process_request</code>. Following live code from Django 1.3 could be a great example to illustrate how descriptor works.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">LazyUser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;_cached_user&#39;</span><span class="p">):</span>
+</span><span class='line'>            <span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">get_user</span>
+</span><span class='line'>            <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AuthenticationMiddleware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;session&#39;</span><span class="p">),</span> <span class="s">&quot;blah balh&quot;</span>
+</span><span class='line'>        <span class="n">request</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">LazyUser</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="bp">None</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>So, firstly, what is <code>descriptor</code></h2>
+
+<p>Abstract and vague as official documentation is, if you can read it with more concrete experience, you&rsquo;d find it&rsquo;s not that bad actually.</p>
+
+<blockquote><p>The following methods only apply when an instance of the class containing the method (a so-called <strong>descriptor class</strong>) appears in the class dictionary of another new-style class, known as the <strong>owner class</strong>.</p></blockquote>
+
+<p><strong>&ldquo;following methods&rdquo;</strong> refers to</p>
+
+<ul>
+<li><code>object.__get__(self, instance, owner)</code> Called to get the attribute of the owner class (class attribute access) or of an instance of that class (instance attribute access). <code>Owner</code> is always the owner class, while <code>instance</code> is the instance that the attribute was accessed through, or <code>None</code> when the attribute is accessed through the owner. This method should return the (computed) attribute value or raise an AttributeError exception.</li>
+<li><code>object.__set__(self, instance, value)</code> Called to set the attribute on an instance instance of the owner class to a new value.</li>
+<li><code>object.__delete__(self, instance)</code> Called to delete the attribute on an instance instance of the owner class.</li>
+</ul>
+
+
+<h2>Now let&rsquo;s look into the fresh code</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">LazyUser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">&quot;&quot;&quot; LazyUser is a descriptor class</span>
+</span><span class='line'><span class="sd"> &quot;&quot;&quot;</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;_cached_user&#39;</span><span class="p">):</span>
+</span><span class='line'>            <span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">get_user</span>
+</span><span class='line'>            <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AuthenticationMiddleware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;session&#39;</span><span class="p">),</span> <span class="s">&quot;blah balh&quot;</span>
+</span><span class='line'>        <span class="c"># request.__class__ is the *owner class*</span>
+</span><span class='line'>        <span class="c"># request.__class__.user refers to the *instance* of LazyUser</span>
+</span><span class='line'>        <span class="n">request</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">LazyUser</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="bp">None</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Technically speaking, with <code>__get__</code> method defined, <code>class LazyUser</code> becomes a descriptor class and then gets assigned to <code>request.__class__</code> by hook method in <code>AuthenticationMiddleware</code>. After that <code>request.__class__</code> becomes the counterpart &mdash; <strong>owner</strong> class.</p>
+
+<h2>Why called lazy?</h2>
+
+<p>By now, we&rsquo;ve inspected every cover of the code. However, nothing concrete has actually happened yet, all of this has nothing to do with the real <code>User</code> object (store in session) by now. In other words, the actual access to <code>User</code> object has been postponed as much as possible, until <code>request.user</code> attributed is queried (then <code>__get__(...)</code> executes and return a meaningful user object from session, but the detail is not important to current topic). That&rsquo;s where the name <em>LazyUser</em> comes from.</p>
+
+<h2>A closer look</h2>
+
+<p>Let&rsquo;s take a closer look at the parameters of <code>__get__</code> method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that, corresponding to documentation, <code>object.__get__(self, instance, owner)</code>, we can find <code>instance</code> is used instead of <code>owner</code>. Here in our live example, <code>request</code> is the <em>instance</em> of owner class (<code>request.__class__</code>).</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!--for blog/index-->
+      <h1 class="entry-title"><a href="/blog/2014/02/14/quotation-in-Unix-shell/">Quotation Concept in Unix Shell</a></h1>
+    
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-14T00:00:00+08:00" pubdate data-updated="true">Feb 14<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The basic actions of the shell are simple. It reads a line. This is
+either from a file, a script, or from a user.</p>
+
+<ul>
+<li>First, meta-characters are &ldquo;handled.&rdquo;</li>
+<li>Second, the name of the executable is found.</li>
+<li>Third, the arguments are passed to the program.</li>
+<li>Fourth, the file redirection is setup.</li>
+<li>Lastly, the program is executed.</li>
+</ul>
+
+
+<h2>Meta-characters and Filename expansion</h2>
+
+<p>This includes <strong>variable evaluation</strong> (variables start with a <code>$</code>), and
+<strong>filename expansion</strong>.</p>
+
+<h2>Quotation</h2>
+
+<p>Why quote at all, and what do I mean by quoting? Well, the shell
+understands many special characters, called <code>meta-characters</code>. These
+each have a purpose, and there are so many, beginners often suffer from
+meta-itis. Example: The dollar sign(<code>$</code>) is a meta-character, and tells
+the shell the next word is a variable. If you wanted to use the dollar
+sign as a regular character, how can you tell the shell the dollar sign
+does not indicate a variable? Answer: the dollar sign must be
+<strong>quoted</strong>. Why? <strong>Quoted characters do not have a special meaning.</strong></p>
+
+<blockquote><p>Quoted characters do not have a special meaning.</p></blockquote>
+
+<p>A surprising number of characters have special meanings. The lowly
+space, often forgotten in many books, is an extremely important
+meta-character. Consider the following</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rm -i file1 file2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The shell breaks this line up to four words, which can be logically
+divided into two classes.</p>
+
+<ol>
+<li><code>rm</code> is program to execute</li>
+<li><code>-i</code>, <code>file1</code>, <code>file2</code> are parameters or arguments, which will be
+passed to <code>rm</code> before it runs.</li>
+</ol>
+
+
+<p>To shell, there is no difference between <code>-i</code> and <code>file1</code>, except that
+it follows convention that options begin with a hyphen, like <code>-i</code>. All
+shell cares is to extract four words from the line, then find the
+executable <code>rm</code> and pass the other three parameters to it. However, when
+you input the quoted version, it will be another story</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rm -i <span class="s1">&#39;file1 file2&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that, &ldquo;quoted characters do not have a special meaning&rdquo; , so does
+the space between &lsquo;file1&rsquo; and &lsquo;file2&rsquo;. DO NOT perceive &lsquo;file1 file2&rsquo; as
+a string in C or any other programming languages. <strong>There is no concept
+of C-like string in shell</strong> and don&rsquo;t even try to make the metaphor,
+which is often overlooked by beginners yet extremely important to keep
+in mind, in order to understand quotation correctly.</p>
+
+<p>A more accurate description of the quoting is a <strong>switch</strong>, or toggle &mdash;
+it turns on and off the quotation status whether the meta-characters
+within text are getting to be interpreted. Therefore, following
+variations are all equivalent</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rm <span class="s1">&#39;file1 file2&#39;</span>
+</span><span class='line'>rm file1<span class="s1">&#39; &#39;</span>file2
+</span><span class='line'>rm f<span class="s1">&#39;ile1 file&#39;</span>2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just remember: There is NO concept of string in shell at all.</p>
+
+<h2>Strong versus weak quoting</h2>
+
+<p>Simple enough,</p>
+
+<ul>
+<li><code>"</code> is weakest: backslash(<code>\</code>), dollar sign(<code>$</code>), and the
+back-stick(&#8220;) all keep effective inside the double quotation.</li>
+<li><code>'</code> is strongest: single quotation returns everything inside the
+quotation literally.</li>
+</ul>
+
+
+<h2>Nested quotation</h2>
+
+<p>Once you have fully understood that The quotation marks in the Bourne
+shell are not used to define a string, but to <strong>disable</strong> or <strong>enable</strong>
+interpretation of meta-characters, it&rsquo;s easy and intuitive to play with
+so called &lsquo;nested quotation&rsquo;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">&#39;Strong quotes use &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; and weak quotes use &quot;&#39;</span>
+</span><span class='line'>Strong quotes use <span class="err">&#39;</span> and weak quotes use <span class="err">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above example tells all story about nested quotation. Equivalently</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">&#39;&quot;&#39;</span><span class="s2">&quot;&#39;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>simply gives <code>"'</code>.</p>
+
+<h2>some tricky cases</h2>
+
+<p>There are always chances for you to use nested quotation in composing a
+program. What makes it tricky is that the order of quotation matters,
+let&rsquo;s look at something live</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$perl</span> -e <span class="s2">&quot;print(&#39;hello world&#39;)&quot;</span>
+</span><span class='line'>hello world<span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Printing hello world as we excepted, but Where is the \$ from? No magic,
+it is the beginning of the next line, because the absence of
+<code>line switch</code> at the tail of &lsquo;hello world&rsquo;. I thought following will be
+fine</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$perl</span> -e <span class="s2">&quot;print(&#39;hello world\n&#39;)&quot;</span>
+</span><span class='line'>hello world<span class="se">\n</span><span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But it isn&rsquo;t. Single quotation scapes &lsquo;n&rsquo; as Perl string syntax
+specified (NOTE, n is an escape chatachter defined by programing
+language, which has nothing to do with quotation in shell). In this
+cases, following is the way to set it right</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$perl</span> -e <span class="s1">&#39;print(&quot;hello world\n&quot;)&#39;</span>
+</span><span class='line'>hello world
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Another question worthy of thinking is, will
+<code>perl -e print("hello world\n")</code> works? Now that <code>'a'</code> has no difference
+with <code>a</code> to shell, why <code>'print("hello world\n")'</code> works while
+<code>print("hello world\n")</code> doesn&rsquo;t? Here is the result</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$perl</span> -e print<span class="o">(</span><span class="s2">&quot;hello world\n&quot;</span><span class="o">)</span>
+</span><span class='line'>Unknown file attribute.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>What&rsquo;s next</h3>
+
+<p>I&rsquo;m planning to write something about <strong>escape character versus
+quotation</strong> later.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section class="aside-about">
+    <div class="avatar"></div>
+    <span class="aside-name">Fan Zhang</span>
+
+    <div>
+        <ul class="sns">
+            <li><a href="https://github.com/ColinZhang" title="Fork me on Github" class="github"></a></li>
+            <li><a href="http://www.linkedin.com/profile/view?id={handle}" title="View my LinkedIn profile"
+                   class="linkedin"></a></li>
+            <li><a href="https://plus.google.com/{handle}" title="View my Google Plus profile" class="google"></a></li>
+            <li><a href="mailto:colin.zhang1992@gmail.com" title="Email to me" class="email"></a></li>
+        </ul>
+    </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Fan Zhang -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>

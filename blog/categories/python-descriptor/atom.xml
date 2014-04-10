@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Python Descriptor | Colin's Key]]></title>
+  <link href="http://colins-key.herokuapp.com/blog/categories/python-descriptor/atom.xml" rel="self"/>
+  <link href="http://colins-key.herokuapp.com/"/>
+  <updated>2014-04-10T21:00:06+08:00</updated>
+  <id>http://colins-key.herokuapp.com/</id>
+  <author>
+    <name><![CDATA[Fan Zhang]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Python Descriptor by Live Example]]></title>
+    <link href="http://colins-key.herokuapp.com/blog/2014/03/12/python-descriptor-by-live-example/"/>
+    <updated>2014-03-12T00:00:00+08:00</updated>
+    <id>http://colins-key.herokuapp.com/blog/2014/03/12/python-descriptor-by-live-example</id>
+    <content type="html"><![CDATA[<p>When browsing the source code of OSQA, I accidentally dipped into Django&rsquo;s implementation of <code>AuthenticationMiddleware</code>, a middleware to attach a <code>user</code> instance to each <code>request</code> when hooked from <code>process_request</code>. Following live code from Django 1.3 could be a great example to illustrate how descriptor works.</p>
+
+<p>``` python
+class LazyUser(object):</p>
+
+<pre><code>def __get__(self, request, obj_type=None):
+    if not hasattr(request, '_cached_user'):
+        from django.contrib.auth import get_user
+        request._cached_user = get_user(request)
+    return request._cached_user
+</code></pre>
+
+<p>class AuthenticationMiddleware(object):</p>
+
+<pre><code>def process_request(self, request):
+    assert hasattr(request, 'session'), "blah balh"
+    request.__class__.user = LazyUser()
+    return None
+</code></pre>
+
+<p>```</p>
+
+<h2>So, firstly, what is <code>descriptor</code></h2>
+
+<p>Abstract and vague as official documentation is, if you can read it with more concrete experience, you&rsquo;d find it&rsquo;s not that bad actually.</p>
+
+<blockquote><p>The following methods only apply when an instance of the class containing the method (a so-called <strong>descriptor class</strong>) appears in the class dictionary of another new-style class, known as the <strong>owner class</strong>.</p></blockquote>
+
+<p><strong>&ldquo;following methods&rdquo;</strong> refers to</p>
+
+<ul>
+<li><code>object.__get__(self, instance, owner)</code> Called to get the attribute of the owner class (class attribute access) or of an instance of that class (instance attribute access). <code>Owner</code> is always the owner class, while <code>instance</code> is the instance that the attribute was accessed through, or <code>None</code> when the attribute is accessed through the owner. This method should return the (computed) attribute value or raise an AttributeError exception.</li>
+<li><code>object.__set__(self, instance, value)</code> Called to set the attribute on an instance instance of the owner class to a new value.</li>
+<li><code>object.__delete__(self, instance)</code> Called to delete the attribute on an instance instance of the owner class.</li>
+</ul>
+
+
+<h2>Now let&rsquo;s look into the fresh code</h2>
+
+<p>``` python
+class LazyUser(object):</p>
+
+<pre><code>""" LazyUser is a descriptor class
+"""
+def __get__(self, request, obj_type=None):
+    if not hasattr(request, '_cached_user'):
+        from django.contrib.auth import get_user
+        request._cached_user = get_user(request)
+    return request._cached_user
+</code></pre>
+
+<p>class AuthenticationMiddleware(object):</p>
+
+<pre><code>def process_request(self, request):
+    assert hasattr(request, 'session'), "blah balh"
+    # request.__class__ is the *owner class*
+    # request.__class__.user refers to the *instance* of LazyUser
+    request.__class__.user = LazyUser() 
+    return None
+</code></pre>
+
+<p>```</p>
+
+<p>Technically speaking, with <code>__get__</code> method defined, <code>class LazyUser</code> becomes a descriptor class and then gets assigned to <code>request.__class__</code> by hook method in <code>AuthenticationMiddleware</code>. After that <code>request.__class__</code> becomes the counterpart &mdash; <strong>owner</strong> class.</p>
+
+<h2>Why called lazy?</h2>
+
+<p>By now, we&rsquo;ve inspected every cover of the code. However, nothing concrete has actually happened yet, all of this has nothing to do with the real <code>User</code> object (store in session) by now. In other words, the actual access to <code>User</code> object has been postponed as much as possible, until <code>request.user</code> attributed is queried (then <code>__get__(...)</code> executes and return a meaningful user object from session, but the detail is not important to current topic). That&rsquo;s where the name <em>LazyUser</em> comes from.</p>
+
+<h2>A closer look</h2>
+
+<p>Let&rsquo;s take a closer look at the parameters of <code>__get__</code> method:</p>
+
+<p><code>python
+def __get__(self, request, obj_type=None):
+</code></p>
+
+<p>Note that, corresponding to documentation, <code>object.__get__(self, instance, owner)</code>, we can find <code>instance</code> is used instead of <code>owner</code>. Here in our live example, <code>request</code> is the <em>instance</em> of owner class (<code>request.__class__</code>).</p>
+]]></content>
+  </entry>
+  
+</feed>

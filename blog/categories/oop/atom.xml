@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: OOP | Colin's Key]]></title>
+  <link href="http://colins-key.herokuapp.com/blog/categories/oop/atom.xml" rel="self"/>
+  <link href="http://colins-key.herokuapp.com/"/>
+  <updated>2014-04-10T21:00:06+08:00</updated>
+  <id>http://colins-key.herokuapp.com/</id>
+  <author>
+    <name><![CDATA[Fan Zhang]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Python: Magic Methods]]></title>
+    <link href="http://colins-key.herokuapp.com/blog/2014/03/15/all-about-OOP-in-Python-Part-II/"/>
+    <updated>2014-03-15T22:00:00+08:00</updated>
+    <id>http://colins-key.herokuapp.com/blog/2014/03/15/all-about-OOP-in-Python-Part-II</id>
+    <content type="html"><![CDATA[<p>This post is second part of my <strong>Python OOP</strong> serials, talking about <em>comon magic methods</em> in Python.</p>
+
+<h2>Index and slice: <code>__getitem__</code> and <code>__setitem__</code></h2>
+
+<p><code>__getitem__</code>: After a class defines this method, index operation on its instance will invoke <code>__getitem__</code>. That is, <code>X[i]</code> will be process as <code>X.__getitem__(i)</code> by Python (Further, as <code>class.__getitem__(X, i)__</code>).</p>
+
+<h3>capture slicing</h3>
+
+<p>Besides index, slicing operation also invokes <code>__getitem__</code>. Formally, that is the way how built-in types to process slicing.</p>
+
+<p>``` python</p>
+
+<blockquote><blockquote><blockquote><p>L = [5, 6, 7, 8, 9]
+L[2:4]
+[7, 8]
+```</p></blockquote></blockquote></blockquote>
+
+<p>What realling happens behind the scene is,</p>
+
+<p><code>python
+L[slice(2, 4)] # 1
+__getitem__(L, (slice(2, 4, None)) # 2
+</code></p>
+
+<h2>Iteration by indexing</h2>
+
+<p><code>For</code> loop invokes <code>__getitem__</code> each time a iteration, with an automatic increasing <em>index</em>. Therefore, the situation is: any object that can response to index operation is able to respond iteration, in the similar way.</p>
+
+<p>Actually, many other operations will trigger `<strong>getitem</strong> as well, many of which are quite intuitive &mdash; they all have a sense of looping over a sequence, such as:</p>
+
+<p>```python</p>
+
+<blockquote><blockquote><blockquote><p>&lsquo;p&rsquo; in X
+[ c for c in X ]
+map(str.upper, X)
+(a, b, c, d) = X # sequence assignment
+&lsquo;&rsquo;.join(X)
+```</p></blockquote></blockquote></blockquote>
+
+<p>The context where these operations happen is called <strong>interation environment</strong>.</p>
+
+<h2>Interation: <code>__iter__</code> and <code>__next___</code></h2>
+
+<p>Although <code>__getitem__</code> is a effective way to implement iteration, Python would perfer to try <code>__iter__</code> first, and then <code>__getitem__</code> if the former fails to exist.</p>
+
+<p>Technically speaking, <code>__iter__</code> method should return a iterator object, which provides a <code>__next__</code> method to access next object of the iteration sequence. Python keeps invoking <code>__next__</code> method until <code>StopIteration</code> exception raises.</p>
+
+<h2>Membership: <code>__contains__</code>, <code>__iter__</code> and <code>__getitem__</code></h2>
+
+<p>Note that <em>operation overriding happens at multiple leaels</em>, which means in order to fulfill a certain objective, class can choose to provide either a specific and dedicate method or a second-class but more general plan B.</p>
+
+<p>For example, membership operation can be implemented as anyone of <code>___getitem__</code>, <code>__iter__</code> and <code>__contains__</code>. But the priority is in reverse order: <code>__getitem__</code> can works, but <code>__contains__</code> is more suitable and dedicate.</p>
+
+<h2>Attribute: <code>__getattr__</code> and <code>__setattr__</code></h2>
+
+<ul>
+<li><code>__getattr__</code>, <code>X.undefined</code></li>
+<li><code>__getattribute__</code>, all <code>X.attr</code></li>
+<li><code>__setattr__</code>, <code>X.attr = val</code></li>
+</ul>
+
+
+<p>Note that: any assignment to <code>self.attr</code> in <code>__setattr__</code> will cause dead loop and ending in a crash. Correct way is to manipulate attributes via <code>__dict__</code>.</p>
+
+<p>Other attribution management tools to be cover later:</p>
+
+<ul>
+<li><code>__getattribute__</code></li>
+<li><code>Property</code> built-in function</li>
+<li>Descriptor protocol and <code>__get__</code>, <code>__set___</code></li>
+</ul>
+
+
+<h3>Simulate privacy: part I</h3>
+
+<p>Python didnt provide a <code>private</code> statement, which means a class cannot hold its own private data immune from outside modification. Thanks to <code>__setattr__</code>, however, we can sitimulate this behavior by overwriting <code>__setattr__</code>.</p>
+
+<h2><code>__repr__</code> and <code>__str__</code></h2>
+
+<h2>Right side and Round side addition</h2>
+
+<h2><code>__call__</code></h2>
+
+<p>When a instance gets invoked, <code>__call__</code> method will be invoked. <code>__call__</code> provides effective way to implement so called <em>bound method</em>. Actually, <code>__calll__</code> might be the best way to store state information in Python, because <code>__call__</code> allows us to attach inner information to a callable object.</p>
+
+<h2>Comparision: <code>__lt__</code>, <code>__gt__</code> and others</h2>
+
+<h2><code>__bool__</code> and <code>__len__</code></h2>
+
+<h2>descructor: <code>__del__</code></h2>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Python: Class]]></title>
+    <link href="http://colins-key.herokuapp.com/blog/2014/03/14/all-about-python-oop-parti/"/>
+    <updated>2014-03-14T13:57:07+08:00</updated>
+    <id>http://colins-key.herokuapp.com/blog/2014/03/14/all-about-python-oop-parti</id>
+    <content type="html"><![CDATA[<p>This post is first part of my <strong>Python OOP</strong> serials, talking about <em>Class, inheritance</em> and <em>Naming space</em> in Python.</p>
+
+<h2>类(class)</h2>
+
+<h3>语句</h3>
+
+<ol>
+<li>与C++不同，Python的<code>class</code>并不是声明式的。和<code>def</code> 一样，<code>class</code>语句是
+对象的创建者，并且是一个隐含的赋值语句。</li>
+<li>和 <code>def</code> 一样，<code>class</code> 语句也是真正的可执行代码。</li>
+</ol>
+
+
+<h3>命名空间</h3>
+
+<p>从类得到命令空间的过程如下：Python执行<code>class</code>语句时，会从头至尾执行其中的所有语句。
+在这个过程中，赋值运算会在这个类作用域中创建变量名，从而成为对应的类对象的属性。
+就像模块和函数：</p>
+
+<ol>
+<li>和函数一样，<code>class</code>语句是本地作用域，由内嵌的赋值语句建立的变量名就存在于这个本地
+作用域中</li>
+<li>和模块内的变量名一样，在 <code>class</code> 内的赋值的变量名会变成类对象中的属性。</li>
+<li>不同之处在于，类是可以继承的。在类或实例对象中找不到的属性就会从其他类中获取。</li>
+</ol>
+
+
+<p>继承搜索只会在<strong>引用</strong>时发生，而不会在赋值时发生。 <code>x.attr</code> 会通过继承在类中查找，
+而 <code>y.attr=foo</code> 则会在 <code>y</code> 中创建 <code>y.attr</code>.</p>
+
+<h3>方法</h3>
+
+<p>从程序设计的角度来看，方法的工作方式与简单函数完全一致，只有一个重要差异：
+方法的第一个参数总是接收方法调用的隐形主体（实例对象， <code>self</code> ）。
+因此，下面两种调用方法的方式是完全一样的（而且Python就是这样处理方法调用的）</p>
+
+<p><code>python
+instance.method(args...) # 1
+class.method(instance, args...) # 2
+</code></p>
+
+<p>(1)的方法调用会被翻译成(2)的形式，然后class通过继承搜索机制找到method的所在位置。</p>
+
+<h3>其他可能</h3>
+
+<p>静态方法和类方法。</p>
+
+<h2>继承</h2>
+
+<p>每次使用 <code>object.attr</code> 时都会发生<strong>继承</strong>：Python会从头至尾搜索命名空间树，
+先从<strong>对象</strong>开始，寻找所能找到的第一个 <code>attr</code> 。在方法中引用 <code>self.foo</code>
+也会触发继承。树中较低的定义会覆盖较高的定义，继承构成了专有化的基础。</p>
+
+<pre><code>［Super Class］  [Super Class]
+       \               /
+        \             /
+       +--------------+
+       |     class    |
+       +--------------+
+               ^
+               |
+       +--------------+
+       |   instance   |
+       +--------------+
+</code></pre>
+
+<h3>ABC</h3>
+
+<p>``` python</p>
+
+<h1>abc.py</h1>
+
+<p>class Super:</p>
+
+<pre><code>def delegate(self):
+    self.action()
+</code></pre>
+
+<p>class Provider(Super):</p>
+
+<pre><code>def action(self):
+    print('in Provider.action')
+</code></pre>
+
+<p>if <strong>name</strong> == &lsquo;<strong>main</strong>&rsquo;:</p>
+
+<pre><code>x = Provider()
+x.delegate()
+</code></pre>
+
+<p>```</p>
+
+<p>``` sh</p>
+
+<blockquote><blockquote><blockquote><p>./abc.py
+in Provider.action
+```</p></blockquote></blockquote></blockquote>
+
+<p>当调用 <code>x.delegate()</code>  时，有两个独立的继承搜索会发生：</p>
+
+<ol>
+<li><p>在 <code>x.delegate()</code> 调用中，Python会在继承树中发现，
+<code>delegate</code> 方法在 <code>Super</code> 类中，实例 <code>x</code> 会传给这个方法的 <code>self</code> 参数。</p></li>
+<li><p><code>Super.delegate()</code>  中， <code>self.action()</code>  会对 <code>self</code> 以及其上层的对象进行查找，
+因为这里 <code>self</code> 就是 <code>Provider</code> 实例，所以 <code>self.action()</code> 会
+调用   <code>Provider.action()</code>  。</p></li>
+</ol>
+
+
+<h2>命名空间全貌</h2>
+
+<h3>规则</h3>
+
+<h4>简单变量名</h4>
+
+<ul>
+<li><p>Assignment(  <code>X=value</code> )
+  Makes names <strong>local</strong>: creates or changes the name X in the current local scope, unless declared global.</p></li>
+<li><p>Reference (  <code>X</code> )
+  Looks for the name X in the current local scope, then any and all <strong>enclosing functions[?]</strong>, then the current global scope, then the <strong>built-in scope[?]</strong>.</p></li>
+</ul>
+
+
+<h4>属性名称</h4>
+
+<ul>
+<li><p>Assignment (  <code>object.X = value</code> )
+  Creates or alters the attribute name X in the namespace of the object being qualified, and none other. Inheritance-tree climbing happens only on attribute reference, not on attribute assignment.</p></li>
+<li><p>Reference (  <code>object.X</code> )
+ For <strong>class-based</strong> objects, searches for the attribute name X in object, then in all accessible classes above it, using the <em>inheritance search procedure</em>. For <strong>nonclass</strong> objects such as modules, fetches X from object <em>directly</em>.</p></li>
+</ul>
+
+
+<h3>例子</h3>
+
+<p>```python</p>
+
+<h1>manynames.py</h1>
+
+<p>X = 11</p>
+
+<p>def f():</p>
+
+<pre><code>print(X)
+</code></pre>
+
+<p>def g():</p>
+
+<pre><code>X = 22
+print(X)
+</code></pre>
+
+<p>class C:</p>
+
+<pre><code>X = 33
+def m(self):
+    X = 44
+    self.X = 55
+</code></pre>
+
+<p>if <strong>name</strong> == &lsquo;<strong>main</strong>&rsquo;:</p>
+
+<pre><code>print(X)        # 11
+f()             # 11
+g()             # 22
+print(X)        # 11
+
+obj = C()
+print(obj.X)    # 33
+
+obj.m()
+print(obj.X)    # 55
+print(C.X)      # 33
+</code></pre>
+
+<p>```</p>
+
+<p>In another file,</p>
+
+<p>```python</p>
+
+<h1>otherfiles.py</h1>
+
+<p>import manynames</p>
+
+<p>X = 66
+print(X)             # 66
+print(manynames.X)   # 11</p>
+
+<p>manynames.f()        # 11
+manynames.g()        # 22</p>
+
+<p>print(manynames.C.X) # 33</p>
+
+<p>I = manynames.C() <br/>
+print(I.X)           # 33
+I.m()          <br/>
+print(I.X)           # 55
+```</p>
+
+<h3>命名空间的字典</h3>
+
+<p>模块的命名空间实际上是以<strong>字典</strong>(  <code>__dict__</code> )的形式出现的，
+类和实例对象也是如此：属性点号运算其实内部就是字典，而继承属性其实就是搜索链接的字典而已。</p>
+
+<p>如果attr是x的实例属性，则有两种方式可以对其读取和赋值。</p>
+
+<p><code>python
+x.attr, x.__dict__['attr']
+</code></p>
+
+<p>但是，  <code>x.attr</code> 会触发继承搜索，而 <code>x.__dict__</code> 只包括了<strong>实例</strong>上的属性。</p>
+
+<h3>命名空间的链接</h3>
+
+<p>参考如下的爬树程序</p>
+
+<p>``` python</p>
+
+<h1>classtree.py</h1>
+
+<p>&ldquo;&rdquo;&ldquo;
+Climb inheritance trees using namespace links,
+displaying higher superclasses with indentation.
+&rdquo;&ldquo;&rdquo;</p>
+
+<p>def classtree(cls, indent):</p>
+
+<pre><code>print('.' * indent + cls.__name__)
+for supercls in cls.__bases__:
+    classtree(supercls, indent + 3)
+</code></pre>
+
+<p>def selftest():</p>
+
+<pre><code>class A:        pass
+class B(A):     pass
+class C(A):     pass
+class D(B,C):   pass
+class E:        pass
+class F(D,E):   pass
+
+print "Tree of %s" % F
+classtree(F, 0)
+</code></pre>
+
+<p>if <strong>name</strong> == &lsquo;<strong>main</strong>&rsquo;:</p>
+
+<pre><code>selftest()
+</code></pre>
+
+<p>```</p>
+
+<p>输出结果如下</p>
+
+<p><code>
+Tree of __main__.F
+F
+...D
+......B
+.........A
+......C
+.........A
+...E
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>

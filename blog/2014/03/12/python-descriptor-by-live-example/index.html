@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+        
+            Python Descriptor by Live Example
+         - 
+    
+    Colin's Key
+    </title>
+  <meta name="author" content="Fan Zhang">
+
+  
+  <meta name="description" content="When browsing the source code of OSQA, I accidentally dipped into Django&rsquo;s implementation of AuthenticationMiddleware, a middleware to attach a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://colins-key.herokuapp.com/blog/2014/03/12/python-descriptor-by-live-example">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Colin's Key" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Arvo:400,700' rel='stylesheet' type='text/css'>
+
+<script src="/javascripts/main.js"></script>
+<script src="/javascripts/jquery.classysocial.js"></script>
+
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Colin's Key</a></h1>
+  
+    <h2>Go with your instinct, with your first instinct</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:colins-key.herokuapp.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Start</a></li>
+  <li><a href="/blog/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Python Descriptor by Live Example</h1>
+      <h1 class="post-subtitle"></h1>
+    
+
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-12T00:00:00+08:00" pubdate data-updated="true">Mar 12<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>When browsing the source code of OSQA, I accidentally dipped into Django&rsquo;s implementation of <code>AuthenticationMiddleware</code>, a middleware to attach a <code>user</code> instance to each <code>request</code> when hooked from <code>process_request</code>. Following live code from Django 1.3 could be a great example to illustrate how descriptor works.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">LazyUser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;_cached_user&#39;</span><span class="p">):</span>
+</span><span class='line'>            <span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">get_user</span>
+</span><span class='line'>            <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AuthenticationMiddleware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;session&#39;</span><span class="p">),</span> <span class="s">&quot;blah balh&quot;</span>
+</span><span class='line'>        <span class="n">request</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">LazyUser</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="bp">None</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>So, firstly, what is <code>descriptor</code></h2>
+
+<p>Abstract and vague as official documentation is, if you can read it with more concrete experience, you&rsquo;d find it&rsquo;s not that bad actually.</p>
+
+<blockquote><p>The following methods only apply when an instance of the class containing the method (a so-called <strong>descriptor class</strong>) appears in the class dictionary of another new-style class, known as the <strong>owner class</strong>.</p></blockquote>
+
+<p><strong>&ldquo;following methods&rdquo;</strong> refers to</p>
+
+<ul>
+<li><code>object.__get__(self, instance, owner)</code> Called to get the attribute of the owner class (class attribute access) or of an instance of that class (instance attribute access). <code>Owner</code> is always the owner class, while <code>instance</code> is the instance that the attribute was accessed through, or <code>None</code> when the attribute is accessed through the owner. This method should return the (computed) attribute value or raise an AttributeError exception.</li>
+<li><code>object.__set__(self, instance, value)</code> Called to set the attribute on an instance instance of the owner class to a new value.</li>
+<li><code>object.__delete__(self, instance)</code> Called to delete the attribute on an instance instance of the owner class.</li>
+</ul>
+
+
+<h2>Now let&rsquo;s look into the fresh code</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">LazyUser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>  <span class="sd">&quot;&quot;&quot; LazyUser is a descriptor class</span>
+</span><span class='line'><span class="sd"> &quot;&quot;&quot;</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;_cached_user&#39;</span><span class="p">):</span>
+</span><span class='line'>            <span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">get_user</span>
+</span><span class='line'>            <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">_cached_user</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">AuthenticationMiddleware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;session&#39;</span><span class="p">),</span> <span class="s">&quot;blah balh&quot;</span>
+</span><span class='line'>        <span class="c"># request.__class__ is the *owner class*</span>
+</span><span class='line'>        <span class="c"># request.__class__.user refers to the *instance* of LazyUser</span>
+</span><span class='line'>        <span class="n">request</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">LazyUser</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="bp">None</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Technically speaking, with <code>__get__</code> method defined, <code>class LazyUser</code> becomes a descriptor class and then gets assigned to <code>request.__class__</code> by hook method in <code>AuthenticationMiddleware</code>. After that <code>request.__class__</code> becomes the counterpart &mdash; <strong>owner</strong> class.</p>
+
+<h2>Why called lazy?</h2>
+
+<p>By now, we&rsquo;ve inspected every cover of the code. However, nothing concrete has actually happened yet, all of this has nothing to do with the real <code>User</code> object (store in session) by now. In other words, the actual access to <code>User</code> object has been postponed as much as possible, until <code>request.user</code> attributed is queried (then <code>__get__(...)</code> executes and return a meaningful user object from session, but the detail is not important to current topic). That&rsquo;s where the name <em>LazyUser</em> comes from.</p>
+
+<h2>A closer look</h2>
+
+<p>Let&rsquo;s take a closer look at the parameters of <code>__get__</code> method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that, corresponding to documentation, <code>object.__get__(self, instance, owner)</code>, we can find <code>instance</code> is used instead of <code>owner</code>. Here in our live example, <code>request</code> is the <em>instance</em> of owner class (<code>request.__class__</code>).</p>
+</div>
+
+
+  <footer>
+      <p class="meta">
+          
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Fan Zhang</span></span>
+
+          
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-12T00:00:00+08:00" pubdate data-updated="true">Mar 12<span>th</span>, 2014</time>
+          
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/python/'>Python</a>, <a class='category' href='/blog/categories/python-descriptor/'>Python descriptor</a>
+  
+</span>
+
+
+      </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/02/14/quotation-in-Unix-shell/" title="Previous Post: Quotation concept in Unix Shell">&laquo; Quotation concept in Unix Shell</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/03/14/all-about-python-oop-parti/" title="Next Post: Python: Class">Python: Class &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section class="aside-about">
+    <div class="avatar"></div>
+    <span class="aside-name">Fan Zhang</span>
+
+    <div>
+        <ul class="sns">
+            <li><a href="https://github.com/ColinZhang" title="Fork me on Github" class="github"></a></li>
+            <li><a href="http://www.linkedin.com/profile/view?id={handle}" title="View my LinkedIn profile"
+                   class="linkedin"></a></li>
+            <li><a href="https://plus.google.com/{handle}" title="View my Google Plus profile" class="google"></a></li>
+            <li><a href="mailto:colin.zhang1992@gmail.com" title="Email to me" class="email"></a></li>
+        </ul>
+    </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Fan Zhang -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>
