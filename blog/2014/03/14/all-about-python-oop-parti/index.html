@@ -56,22 +56,27 @@
 </hgroup>
 
 </header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:CMade.github.io" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Start</a></li>
-  <li><a href="/blog/archives">Blogs</a></li>
-</ul>
+  <nav role="navigation"><!--<ul class="subscription" data-subscription="rss">-->
+  <!--<li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>-->
+  <!---->
+<!--</ul>-->
+  <!---->
+<!--<form action="https://www.google.com/search" method="get">-->
+  <!--<fieldset role="search">-->
+    <!--<input type="hidden" name="q" value="site:CMade.github.io" />-->
+    <!--<input class="search" type="text" name="q" results="0" placeholder="Search"/>-->
+  <!--</fieldset>-->
+<!--</form>-->
+  <!---->
+<!--<div id="cssmenu">-->
+    <ul class="main-navigation">
+        <li><a href="/">Start</a></li>
+        <li><a href="/blog/archives">Blogs</a></li>
+        <li><a href="/blog/archives">Hello</a></li>
+        <li><a href="/blog/archives">Menu</a></li>
+    </ul>
+<!--</div>-->
+
 
 </nav>
   <div id="main">
@@ -497,18 +502,14 @@
     <section class="aside-about">
     <div class="avatar"></div>
     <span class="aside-name">Fan Zhang</span>
-
-    <div>
-        <ul class="sns">
-            <li><a href="https://github.com/cmade" title="Fork me on Github" class="github"></a></li>
-            <li><a href="http://www.linkedin.com/profile/view?id={who}" title="View my LinkedIn profile"
-                   class="linkedin"></a></li>
-            <li><a href="https://plus.google.com/{who}" title="View my Google Plus profile" class="google"></a></li>
-            <li><a href="mailto:colin.zhang1992@gmail.com" title="Email to me" class="email"></a></li>
-        </ul>
-    </div>
-</section>
-<section>
+    <ul class="sns">
+            <li><a href="https://github.com/cmade" title="Fork me on Github"><i class="fa fa-github-alt fa-2x"></i></a></li>
+            <li><a href="http://www.linkedin.com/profile/view?id={who}" title="LinkedIn"><i class="fa fa-linkedin-square fa-2x"></i></a></li>
+            <li><a href="https://plus.google.com/{who}" title="Plus me"><i class="fa fa-google-plus-square fa-2x"></i></a></li>
+            <li><a href="mailto:colin.zhang1992@gmail.com" title="Write to me"><i class="fa fa-envelope fa-2x"></i></a></li>
+    </ul>
+    <div class="spacer"></div>
+</section><section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
     
@@ -543,7 +544,14 @@
   </div>
   <footer role="contentinfo"><p>
   Copyright &copy; 2014 - Fan Zhang -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  <span class="credit">
+      Powered by <a href="http://octopress.org">Octopress</a>,
+      <a href="http://compass-style.org">Compass</a>,
+      <a href="http://fortawesome.github.io/">Font Awesome</a>
+      and many other open-source projects.
+      <a href="/about.html ">(Credit)</a>
+
+  </span>
 </p>
 
 </footer>
