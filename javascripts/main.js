@@ -42,6 +42,12 @@ $("document").ready(function($){
     var width = nav.css("width");
 
     $(window).scroll(function () {
+
+        if ($("body").height() - $(window).height() < 200){
+            console.log("return");
+            return;
+        }
+
         if ($(this).scrollTop() > 125) {
             nav.addClass("fixed-nav");
             nav.css("width", width);
