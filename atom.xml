@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Colin's Key]]></title>
-  <link href="http://CMade.github.io/atom.xml" rel="self"/>
-  <link href="http://CMade.github.io/"/>
-  <updated>2014-04-15T19:18:04+08:00</updated>
-  <id>http://CMade.github.io/</id>
+  <link href="http://cmade.github.io/atom.xml" rel="self"/>
+  <link href="http://cmade.github.io/"/>
+  <updated>2014-04-16T12:10:17+08:00</updated>
+  <id>http://cmade.github.io/</id>
   <author>
     <name><![CDATA[Fan Zhang]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[CVE-2014-0160]]></title>
-    <link href="http://CMade.github.io/blog/2014/04/10/cve-2014-0160/"/>
+    <link href="http://cmade.github.io/blog/2014/04/10/cve-2014-0160/"/>
     <updated>2014-04-10T17:16:30+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/04/10/cve-2014-0160</id>
+    <id>http://cmade.github.io/blog/2014/04/10/cve-2014-0160</id>
     <content type="html"><![CDATA[<h2>Description from NVD</h2>
 
 <p>The (1) <code>TLS</code> and (2) <code>DTLS</code> implementations in <code>OpenSSL 1.0.1</code> before <code>1.0.1g</code> do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information from process memory via crafted packets that trigger a buffer over-read, as demonstrated by reading private keys, related to <code>d1_both.c</code> and <code>t1_lib.c</code>, aka the Heartbleed bug.</p>
@@ -233,9 +233,9 @@
   
   <entry>
     <title type="html"><![CDATA[Python: Magic Methods]]></title>
-    <link href="http://CMade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II/"/>
+    <link href="http://cmade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II/"/>
     <updated>2014-03-15T22:00:00+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II</id>
+    <id>http://cmade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II</id>
     <content type="html"><![CDATA[<p>This post is second part of my <strong>Python OOP</strong> serials, talking about <em>comon magic methods</em> in Python.</p>
 
 <h2>Index and slice: <code>__getitem__</code> and <code>__setitem__</code></h2>
@@ -339,9 +339,9 @@
   
   <entry>
     <title type="html"><![CDATA[Python: Class]]></title>
-    <link href="http://CMade.github.io/blog/2014/03/14/all-about-python-oop-parti/"/>
+    <link href="http://cmade.github.io/blog/2014/03/14/all-about-python-oop-parti/"/>
     <updated>2014-03-14T13:57:07+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/03/14/all-about-python-oop-parti</id>
+    <id>http://cmade.github.io/blog/2014/03/14/all-about-python-oop-parti</id>
     <content type="html"><![CDATA[<p>This post is first part of my <strong>Python OOP</strong> serials, talking about <em>Class, inheritance</em> and <em>Naming space</em> in Python.</p>
 
 <h2>类(class)</h2>
@@ -679,9 +679,9 @@
   
   <entry>
     <title type="html"><![CDATA[Python Descriptor by Live Example]]></title>
-    <link href="http://CMade.github.io/blog/2014/03/12/python-descriptor-by-live-example/"/>
+    <link href="http://cmade.github.io/blog/2014/03/12/python-descriptor-by-live-example/"/>
     <updated>2014-03-12T00:00:00+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/03/12/python-descriptor-by-live-example</id>
+    <id>http://cmade.github.io/blog/2014/03/12/python-descriptor-by-live-example</id>
     <content type="html"><![CDATA[<p>When browsing the source code of OSQA, I accidentally dipped into Django&rsquo;s implementation of <code>AuthenticationMiddleware</code>, a middleware to attach a <code>user</code> instance to each <code>request</code> when hooked from <code>process_request</code>. Following live code from Django 1.3 could be a great example to illustrate how descriptor works.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -788,9 +788,9 @@
   
   <entry>
     <title type="html"><![CDATA[Quotation Concept in Unix Shell]]></title>
-    <link href="http://CMade.github.io/blog/2014/02/14/quotation-in-Unix-shell/"/>
+    <link href="http://cmade.github.io/blog/2014/02/14/quotation-in-Unix-shell/"/>
     <updated>2014-02-14T00:00:00+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/02/14/quotation-in-Unix-shell</id>
+    <id>http://cmade.github.io/blog/2014/02/14/quotation-in-Unix-shell</id>
     <content type="html"><![CDATA[<p>The basic actions of the shell are simple. It reads a line. This is
 either from a file, a script, or from a user.</p>
 

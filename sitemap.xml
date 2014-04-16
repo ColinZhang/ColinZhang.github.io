@@ -1,39 +1,51 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://CMade.github.io/blog/2014/02/14/quotation-in-Unix-shell/</loc>
-        <lastmod>2014-04-15T18:53:36+08:00</lastmod>
+        <loc>http://cmade.github.io/blog/2014/02/14/quotation-in-Unix-shell/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/blog/2014/03/12/python-descriptor-by-live-example/</loc>
-        <lastmod>2014-04-15T18:53:36+08:00</lastmod>
+        <loc>http://cmade.github.io/blog/2014/03/12/python-descriptor-by-live-example/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/blog/2014/03/14/all-about-python-oop-parti/</loc>
-        <lastmod>2014-04-15T18:53:36+08:00</lastmod>
+        <loc>http://cmade.github.io/blog/2014/03/14/all-about-python-oop-parti/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II/</loc>
-        <lastmod>2014-04-15T18:53:36+08:00</lastmod>
+        <loc>http://cmade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/blog/2014/04/10/cve-2014-0160/</loc>
-        <lastmod>2014-04-15T18:53:36+08:00</lastmod>
+        <loc>http://cmade.github.io/blog/2014/04/10/cve-2014-0160/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/blog/archives/</loc>
-        <lastmod>2014-04-10T17:22:21+08:00</lastmod>
+        <loc>http://cmade.github.io/project/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/blog/</loc>
-        <lastmod>2014-04-10T17:22:21+08:00</lastmod>
+        <loc>http://cmade.github.io/robots.txt</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/</loc>
-        <lastmod>2014-04-10T17:22:21+08:00</lastmod>
+        <loc>http://cmade.github.io/photo/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
     <url>
-        <loc>http://CMade.github.io/robots.txt</loc>
-        <lastmod>2014-03-15T00:25:05+08:00</lastmod>
+        <loc>http://cmade.github.io/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://cmade.github.io/blog/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://cmade.github.io/blog/archives/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://cmade.github.io/about/</loc>
+        <lastmod>2014-04-16T10:21:19+08:00</lastmod>
     </url>
 </urlset>

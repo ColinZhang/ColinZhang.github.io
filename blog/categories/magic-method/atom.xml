@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Magic Method | Colin's Key]]></title>
-  <link href="http://CMade.github.io/blog/categories/magic-method/atom.xml" rel="self"/>
-  <link href="http://CMade.github.io/"/>
-  <updated>2014-04-15T19:18:04+08:00</updated>
-  <id>http://CMade.github.io/</id>
+  <link href="http://cmade.github.io/blog/categories/magic-method/atom.xml" rel="self"/>
+  <link href="http://cmade.github.io/"/>
+  <updated>2014-04-16T12:10:17+08:00</updated>
+  <id>http://cmade.github.io/</id>
   <author>
     <name><![CDATA[Fan Zhang]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Python: Magic Methods]]></title>
-    <link href="http://CMade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II/"/>
+    <link href="http://cmade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II/"/>
     <updated>2014-03-15T22:00:00+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II</id>
+    <id>http://cmade.github.io/blog/2014/03/15/all-about-OOP-in-Python-Part-II</id>
     <content type="html"><![CDATA[<p>This post is second part of my <strong>Python OOP</strong> serials, talking about <em>comon magic methods</em> in Python.</p>
 
 <h2>Index and slice: <code>__getitem__</code> and <code>__setitem__</code></h2>
