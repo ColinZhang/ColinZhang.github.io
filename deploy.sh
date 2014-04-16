@@ -14,4 +14,5 @@ git add --all
 git commit -m "Site updated `date`"
 git push
 
+echo "Done"
 
