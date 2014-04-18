@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Shell | Colin's Key]]></title>
-  <link href="http://CMade.github.io/blog/categories/shell/atom.xml" rel="self"/>
-  <link href="http://CMade.github.io/"/>
-  <updated>2014-04-15T19:18:04+08:00</updated>
-  <id>http://CMade.github.io/</id>
+  <link href="http://cmade.github.io/blog/categories/shell/atom.xml" rel="self"/>
+  <link href="http://cmade.github.io/"/>
+  <updated>2014-04-18T20:32:48+08:00</updated>
+  <id>http://cmade.github.io/</id>
   <author>
     <name><![CDATA[Fan Zhang]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Quotation Concept in Unix Shell]]></title>
-    <link href="http://CMade.github.io/blog/2014/02/14/quotation-in-Unix-shell/"/>
+    <link href="http://cmade.github.io/blog/2014/02/14/quotation-in-Unix-shell/"/>
     <updated>2014-02-14T00:00:00+08:00</updated>
-    <id>http://CMade.github.io/blog/2014/02/14/quotation-in-Unix-shell</id>
+    <id>http://cmade.github.io/blog/2014/02/14/quotation-in-Unix-shell</id>
     <content type="html"><![CDATA[<p>The basic actions of the shell are simple. It reads a line. This is
 either from a file, a script, or from a user.</p>
 

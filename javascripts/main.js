@@ -37,14 +37,13 @@
 
 
 $("document").ready(function($){
-
+    /* Sticky Navigation Bar */
     var nav = $('nav');
     var width = nav.css("width");
 
     $(window).scroll(function () {
 
         if ($("body").height() - $(window).height() < 200){
-            console.log("return");
             return;
         }
 
