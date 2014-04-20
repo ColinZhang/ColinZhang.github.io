@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: 
-
-Sitemap: http://cmade.github.io/sitemap.xml 
