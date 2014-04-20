@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Why Heart Bleeds</title>
+  <meta name="author" content="Fan">
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="/favicon.ico" rel="icon">
+  <link href="/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="/theme/js/modernizr-2.0.js"></script>
+  <script src="/theme/js/ender.js"></script>
+  <script src="/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="/theme/js/main.js" type="text/javascript"></script>
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="/">Colin's Key</a></h1>
+    <h2>Go with your instinct, with your first instinct</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+
+<ul class="main-navigation">
+    <li><a href="/index.html">start</a></li>
+    <li><a href="/archives.html">archive</a></li>
+      <li><a href="/pages/about-me.html">About Me</a></li>
+    <li class="active">
+    <a href="/category/blogs.html">Blogs</a>
+    </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+    <h1 class="entry-title">Why Heart Bleeds</h1>
+    <p class="meta"><time datetime="2014-04-10T13:00:00" pubdate>四 10 四月 2014</time></p>
+</header>
+
+<p class="meta-up">
+<span class="byline author vcard">
+Posted by <span class="fn">Fan</span>
+</span>
+<time datetime="2014-04-10T13:00:00" pubdate>四 10 四月 2014</time><span class="categories">
+<i class="fa fa-tags"></i>
+<a class="category" href="/tag/ssl.html">SSL</a>
+<a class="category" href="/tag/security.html">Security</a>
+<a class="category" href="/tag/networking.html">Networking</a>
+</span>
+</p>
+<div class="entry-content">
+    <!-- reuse summary -->
+    <p class="first last">This blog investigated the recently introduced Heartbeat mechanism in TLS, which unfortunately leads to the widely spread <strong>HeartBleed</strong> vulnerability, aka CVE-2014-0160.</p>
+
+    <div class="section" id="description-from-nvd">
+<h2>Description from NVD</h2>
+<p>The (1) <tt class="docutils literal">TLS</tt> and (2) <tt class="docutils literal">DTLS</tt> implementations in <tt class="docutils literal">OpenSSL 1.0.1</tt> before <tt class="docutils literal">1.0.1g</tt> do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information from process memory via crafted packets that trigger a buffer over-read, as demonstrated by reading private keys, related to <tt class="docutils literal">d1_both.c</tt> and <tt class="docutils literal">t1_lib.c</tt>, aka the Heartbleed bug.</p>
+<p><a class="reference external" href="https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0160">To NVD</a></p>
+</div>
+<div class="section" id="heartbeat-extension">
+<h2>Heartbeat Extension</h2>
+<p>The <strong>Heartbeat Extension</strong> is a new feature augmented for the Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) protocols. Basically the Heartbeat Extension is designed to provide a faster and light-weight keeping-alive mechanism, and DTLS protocol can use it to perform path MTU (PMTU) discovery as well.</p>
+<p>Generally speaking, the Heartbeat Extension works in a quite simple way, in which the client sends out a <tt class="docutils literal">HeartbeatRequest</tt> message and the server respond it with an exact copy of payload to indicate that <em>I'm not only alive but conscious.</em> Of course all messages changed in this routine is on the top of TLS layer. (Precisely speaking, the Heartbeat protocol is a new protocol running on top of the Record Layer.)</p>
+<p><a class="reference external" href="https://tools.ietf.org/html/rfc6520">To RFC6520</a></p>
+</div>
+<div class="section" id="messages">
+<h2>Messages</h2>
+<p>According to RFC6520, the HeartBeat protocol message consists of their type, attached payload and padding.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">struct</span> <span class="p">{</span>
+    <span class="n">HeartbeatMessageType</span> <span class="n">type</span><span class="p">;</span>
+    <span class="n">uint16</span> <span class="n">payload_length</span><span class="p">;</span>
+    <span class="n">opaque</span> <span class="n">payload</span><span class="p">[</span><span class="n">HeartbeatMessage</span><span class="p">.</span><span class="n">payload_length</span><span class="p">];</span>
+    <span class="n">opaque</span> <span class="n">padding</span><span class="p">[</span><span class="n">padding_length</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">HeartbeatMessage</span><span class="p">;</span>
+</pre></div>
+</td></tr></table><p>Though the description in RFC is fairly clear and concise, I'd like to summarize several important and tangent facts for understanding CVE-2014-0160,</p>
+<ul class="simple">
+<li>According to the RFC, The length of the <tt class="docutils literal">type</tt> field is 1 byte, and the length of the <tt class="docutils literal">payload_length</tt> is 2.</li>
+<li>Padding can not be too large: The length of a HeartbeatMessage is <tt class="docutils literal">TLSPlaintext.length</tt> for TLS and <tt class="docutils literal">DTLSPlaintext.length</tt> for DTLS. (decided through peer negotiation, default is 2^14 Bytes(octets))</li>
+<li>Nor can padding be too tiny: The <tt class="docutils literal">padding_length</tt> MUST be at least 16.</li>
+</ul>
+</div>
+<div class="section" id="hits">
+<h2>Hits</h2>
+<p>See what will happen if we send this crafted HeartbeatRequest messages to the vulnerable server,</p>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Transport_Layer_Security">Wikipedia</a></p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="mi">18</span> <span class="mo">03</span> <span class="mo">02</span> <span class="mo">00</span> <span class="mo">03</span> <span class="mo">01</span> <span class="mi">40</span> <span class="mo">00</span>
+
+<span class="mi">18</span>   <span class="o">:</span> <span class="n">Content</span> <span class="n">type</span><span class="o">::</span><span class="n">Heartbeat</span>
+<span class="mo">0302</span> <span class="o">:</span> <span class="n">Major</span> <span class="n">Version</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">Minor</span> <span class="n">Version</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">indicates</span> <span class="n">TLS</span> <span class="mf">1.1</span>
+<span class="mo">0003</span> <span class="o">:</span> <span class="n">Length</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="mo">01</span>   <span class="o">:</span> <span class="n">TLS1_HB_REQUEST</span>
+<span class="mi">4000</span> <span class="o">:</span> <span class="mh">0x4000</span><span class="o">=</span><span class="mi">2</span><span class="o">^</span><span class="mi">14</span><span class="o">=</span><span class="mi">16384</span><span class="p">,</span> <span class="n">indicates</span> <span class="mi">64</span><span class="o">-</span><span class="n">byte</span> <span class="n">length</span> <span class="n">of</span> <span class="n">payload</span>
+</pre></div>
+</td></tr></table><p>Request process happens in <tt class="docutils literal">tls1_process_heartbeat</tt> function.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></div></td><td class="code"><div class="highlight"><pre><span class="kt">int</span>
+<span class="nf">tls1_process_heartbeat</span><span class="p">(</span><span class="n">SSL</span> <span class="o">*</span><span class="n">s</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">s3</span><span class="o">-&gt;</span><span class="n">rrec</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">pl</span><span class="p">;</span>   <span class="c1">// (1) p points to packet</span>
+    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">hbtype</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">payload</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">padding</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span> <span class="cm">/* Use minimum padding */</span>
+
+    <span class="cm">/* Read type and payload length first */</span>
+    <span class="n">hbtype</span> <span class="o">=</span> <span class="o">*</span><span class="n">p</span><span class="o">++</span><span class="p">;</span>        <span class="c1">// (2) p gets advanced to point to `payload_length`</span>
+    <span class="n">n2s</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">payload</span><span class="p">);</span>      <span class="c1">// (3) payload = n2s(*p), p+=2</span>
+    <span class="n">pl</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>               <span class="c1">// (4) p and pl points to payload</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">msg_callback</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">-&gt;</span><span class="n">msg_callback</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">version</span><span class="p">,</span> <span class="n">TLS1_RT_HEARTBEAT</span><span class="p">,</span>
+            <span class="o">&amp;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">s3</span><span class="o">-&gt;</span><span class="n">rrec</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">s3</span><span class="o">-&gt;</span><span class="n">rrec</span><span class="p">.</span><span class="n">length</span><span class="p">,</span>
+            <span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="o">-&gt;</span><span class="n">msg_callback_arg</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">hbtype</span> <span class="o">==</span> <span class="n">TLS1_HB_REQUEST</span><span class="p">)</span>
+        <span class="p">{</span>
+        <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">buffer</span><span class="p">,</span> <span class="o">*</span><span class="n">bp</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">OPENSSL_malloc</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">payload</span> <span class="o">+</span> <span class="n">padding</span><span class="p">);</span>
+        <span class="n">bp</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">;</span>      <span class="c1">// (1) bp points to buffer</span>
+
+        <span class="cm">/* Enter response type, length and copy payload */</span>
+        <span class="o">*</span><span class="n">bp</span><span class="o">++</span> <span class="o">=</span> <span class="n">TLS1_HB_RESPONSE</span><span class="p">;</span>    <span class="c1">// (2) 1st byte: TYPE</span>
+        <span class="n">s2n</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">bp</span><span class="p">);</span>            <span class="c1">// (3) 2-3 byte: payload_length</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">pl</span><span class="p">,</span> <span class="n">payload</span><span class="p">);</span>     <span class="c1">// (*) payload Bytes of secret copied **</span>
+        <span class="n">bp</span> <span class="o">+=</span> <span class="n">payload</span><span class="p">;</span>
+        <span class="cm">/* Random padding */</span>
+        <span class="n">RAND_pseudo_bytes</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">padding</span><span class="p">);</span>
+
+        <span class="c1">//... all secrets get sent to client ...</span>
+    <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="fix">
+<h2>Fix</h2>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span class="gh">diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c</span>
+<span class="gh">index b82fada..bddffd9 100644 (file)</span>
+<span class="gd">--- a/ssl/t1_lib.c</span>
+<span class="gi">+++ b/ssl/t1_lib.c</span>
+<span class="gu">@@ -2588,16 +2588,20 @@ tls1_process_heartbeat(SSL *s)</span>
+        unsigned int payload;
+        unsigned int padding = 16; /* Use minimum padding */
+
+<span class="gd">-       /* Read type and payload length first */</span>
+<span class="gd">-       hbtype = *p++;</span>
+<span class="gd">-       n2s(p, payload);</span>
+<span class="gd">-       pl = p;</span>
+<span class="gd">-</span>
+        if (s-&gt;msg_callback)
+                s-&gt;msg_callback(0, s-&gt;version, TLS1_RT_HEARTBEAT,
+                        &amp;s-&gt;s3-&gt;rrec.data[0], s-&gt;s3-&gt;rrec.length,
+                        s, s-&gt;msg_callback_arg);
+
+<span class="gi">+       /* Read type and payload length first */</span>
+<span class="gi">+       if (1 + 2 + 16 &gt; s-&gt;s3-&gt;rrec.length)</span>
+<span class="gi">+               return 0; /* silently discard */</span>
+<span class="gi">+       hbtype = *p++;</span>
+<span class="gi">+       n2s(p, payload);</span>
+<span class="gi">+       if (1 + 2 + payload + 16 &gt; s-&gt;s3-&gt;rrec.length)</span>
+<span class="gi">+               return 0; /* silently discard per RFC 6520 sec. 4 */</span>
+<span class="gi">+       pl = p;</span>
+<span class="gi">+</span>
+        if (hbtype == TLS1_HB_REQUEST)
+                {
+                unsigned char *buffer, *bp;
+</pre></div>
+</td></tr></table></div>
+
+</div>
+    <footer>
+      <p class="meta">
+<span class="byline author vcard">
+Posted by <span class="fn">Fan</span>
+</span>
+<time datetime="2014-04-10T13:00:00" pubdate>四 10 四月 2014</time><span class="categories">
+<i class="fa fa-tags"></i>
+<a class="category" href="/tag/ssl.html">SSL</a>
+<a class="category" href="/tag/security.html">Security</a>
+<a class="category" href="/tag/networking.html">Networking</a>
+</span>
+      </p>
+<div class="sharing">
+</div>    </footer>
+  </article>
+
+</div>
+<aside class="sidebar">
+<section class="aside-about">
+    <div class="avatar"></div>
+    <span class="aside-name">Fan Zhang</span>
+    <ul class="sns">
+            <li><a href="https://github.com/cmade" title="Fork me on Github"><i class="fa fa-github-alt fa-2x"></i></a></li>
+            <li><a href="http://www.linkedin.com/profile/view?id={who}" title="LinkedIn"><i class="fa fa-linkedin-square fa-2x"></i></a></li>
+            <li><a href="https://plus.google.com/{who}" title="Plus me"><i class="fa fa-google-plus-square fa-2x"></i></a></li>
+            <li><a href="mailto:colin.zhang1992@gmail.com" title="Write to me"><i class="fa fa-envelope fa-2x"></i></a></li>
+    </ul>
+    <div class="spacer"></div>
+</section>    <section>
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+            <li class="post">
+                <a href="/posts/2014/04/CVE-2013-1763/">CVE-2013-1763</a>
+            </li>
+            <li class="post">
+                <a href="/posts/2014/04/CVE-2014-0038/">CVE-2014-0038</a>
+            </li>
+            <li class="post">
+                <a href="/posts/2014/04/why-heart-bleeds/">Why Heart Bleeds</a>
+            </li>
+        </ul>
+    </section>
+    <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="/category/blogs.html">blogs</a></li>
+    </ul>
+</section>
+
+<section>
+    <h1>Tags</h1>
+    <a href="/tag/ssl.html">SSL</a>,    <a href="/tag/security.html">Security</a>,    <a href="/tag/networking.html">Networking</a>,    <a href="/tag/socket.html">Socket</a></section>
+
+
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+      Copyright &copy; 2014 - Fan -
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+</body>
+</html>

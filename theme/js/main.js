@@ -4,9 +4,9 @@
 
 $("document").ready(function($){
     /* Sticky Navigation Bar */
-    var nav = $('nav');
-    var width = nav.css("width");
-    var body = $("body");
+    nav = $("nav");
+    width = nav.css("width");
+    body = $("body");
 
     $(window).scroll(function () {
 
