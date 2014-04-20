@@ -124,6 +124,9 @@ function renderDeliciousLinks(items) {
 }
 
 function stickNavigator(){
+
+    width = $("nav").css("width");
+
     $(window).scroll(function () {
         if ($("body").height() - $(window).height() < 200){
             return;
@@ -131,7 +134,7 @@ function stickNavigator(){
 
         if ($(this).scrollTop() > 125) {
             $("body").addClass("nav-fixed");
-            $("nav").css("width", $("nav").css("width"));
+            $("nav").css("width", width);
         } else {
             $("body").removeClass("nav-fixed");
 
