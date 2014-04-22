@@ -124,15 +124,12 @@ function renderDeliciousLinks(items) {
 }
 
 function stickNavigator(){
-
     width = $("nav").css("width");
-
     $(window).scroll(function () {
         if ($("body").height() - $(window).height() < 200){
             return;
         }
-
-        if ($(this).scrollTop() > 125) {
+        if ($(this).scrollTop() > 130 + 13) {
             $("body").addClass("nav-fixed");
             $("nav").css("width", width);
         } else {
