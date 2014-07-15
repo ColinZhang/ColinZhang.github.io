@@ -120,11 +120,11 @@ html {
   font-family: "Lato", "Georgia", "Helvetica Neue", Arial, sans-serif;
 }
 
-.sans, body > header h2, article header p.meta, article > footer, article > p.meta-up, #content .blog-index footer, #content .blog-index article p.meta-up, article #content .blog-index p.meta-up, #blog-archives a.category, #blog-archives time, aside.sidebar section, body > footer, article body > p.meta-up {
+.sans, body, article header p.meta, article > footer, article > p.meta-up, #content .blog-index footer, #content .blog-index article p.meta-up, article #content .blog-index p.meta-up, #blog-archives a.category, #blog-archives time, aside.sidebar section, body > footer, article body > p.meta-up {
   font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
 }
 
-.serif, body, #content .blog-index a[rel=full-article] {
+.serif, #content .blog-index a[rel=full-article] {
   font-family: "Lato", Georgia, Times, "Times New Roman", serif;
 }
 
@@ -447,23 +447,20 @@ body {
 }
 
 body > header {
-  font-size: 1.2em;
-  overflow: hidden;
   background: url('../images/patterns/dark/escheresque_ste.png?1405427223');
 }
-body > header h1 {
-  display: inline-block;
-  margin: .2em 0 0;
+body > header h1, body > header h2 {
+  display: none;
 }
-body > header h1 a, body > header h1 a:visited, body > header h1 a:hover {
-  color: white;
-  text-decoration: none;
-}
-body > header h2 {
-  margin: 0 0 .4em;
-  font-size: 1em;
-  color: white;
-  font-weight: normal;
+body > header div#logo {
+  display: block;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  background: url('../images/logo.png?1405443486') no-repeat;
+  background-size: auto 80px;
+  background-position: center left;
+  height: 100px;
 }
 
 body > nav {
