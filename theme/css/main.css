@@ -458,9 +458,9 @@ body > header div#logo {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   background: url('../images/logo.png?1405443486') no-repeat;
-  background-size: auto 80px;
+  background-size: auto 70px;
   background-position: center left;
-  height: 100px;
+  height: 90px;
 }
 
 body > nav {
