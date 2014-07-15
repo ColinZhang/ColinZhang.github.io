@@ -137,7 +137,7 @@ function stickNavigator(){
             if (isStick){
                 return;
             }
-            body.addClass("nav-fixed");
+            //body.addClass("nav-fixed");
             $("nav").css("width", width);
             isStick = true;
         } else {
@@ -152,9 +152,9 @@ $.domReady(function() {
   wrapFlashVideos();
   flashVideoFallback();
   addCodeLineNumbers();
-  getNav();
-  addSidebarToggler();
-  stickNavigator();
+//  getNav();
+//  addSidebarToggler();
+//  stickNavigator();
 });
 
 // iOS scaling bug fix
