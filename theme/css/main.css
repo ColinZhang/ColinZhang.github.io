@@ -9,7 +9,7 @@ dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed,
-figure, figcaption, footer, article p.meta-up, header, hgroup,
+figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
@@ -51,7 +51,7 @@ a img {
   border: none;
 }
 
-article, aside, details, figcaption, figure, footer, article p.meta-up, header, hgroup, menu, nav, section, summary {
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
   display: block;
 }
 
@@ -117,7 +117,7 @@ html {
   font-family: "Lato", "Georgia", "Helvetica Neue", Arial, sans-serif;
 }
 
-.sans, body, article header p.meta, article > footer, article > p.meta-up, #content .blog-index footer, #content .blog-index article p.meta-up, article #content .blog-index p.meta-up, #blog-archives a.category, #blog-archives time, aside.sidebar section {
+.sans, body, article header p.meta, article > footer, #content .blog-index footer, #blog-archives a.category, #blog-archives time, aside.sidebar section {
   font-family: "Lato", "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -375,7 +375,7 @@ body > div {
   max-width: 900px;
   min-width: 900px;
 }
-body > nav, body > footer, article body > p.meta-up {
+body > nav, body > footer {
   width: 899px;
   margin: 0 auto;
 }
@@ -543,8 +543,7 @@ article header {
   padding-top: 0px;
   position: relative;
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAABCAYAAACsXeyTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAFUlEQVQIHWNIS0sr/v//PwMMDzY+ADqMahlW4J91AAAAAElFTkSuQmCC') bottom left repeat-x;
-  margin-bottom: 1.5em;
-  padding-bottom: 1em;
+  padding-bottom: .5em;
 }
 article header h1 {
   margin: 0;
@@ -573,23 +572,22 @@ article h2 {
 }
 article p.meta-up {
   position: relative;
-  top: -25px;
-  font-size: .85em;
+  font-size: 0.8em;
   clear: both;
   overflow: hidden;
 }
-article > footer, article > p.meta-up {
+article > footer {
   padding-bottom: .5em;
   margin-top: 2em;
 }
-article > footer p.meta, article > p.meta-up p.meta {
+article > footer p.meta {
   margin-bottom: .8em;
   font-size: .85em;
   clear: both;
   overflow: hidden;
 }
 
-.separator, article > footer .byline + time:before, article > p.meta-up .byline + time:before, article > footer time + time:before, article > p.meta-up time + time:before, article > footer .comments:before, article > p.meta-up .comments:before, article > footer .byline ~ .categories:before, article > p.meta-up .byline ~ .categories:before {
+.separator, article > footer .byline + time:before, article > footer time + time:before, article > footer .comments:before, article > footer .byline ~ .categories:before {
   content: "\2022 ";
   padding: 0 .4em 0 .2em;
   display: inline-block;
@@ -645,7 +643,7 @@ article > footer p.meta, article > p.meta-up p.meta {
 #content .blog-index article > div.entry-content > p:first-child {
   margin-bottom: 2px;
 }
-#content .blog-index footer, #content .blog-index article p.meta-up, article #content .blog-index p.meta-up {
+#content .blog-index footer {
   margin-top: 1em;
 }
 
@@ -653,7 +651,7 @@ article > footer p.meta, article > p.meta-up p.meta {
   text-align: center;
   position: relative;
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAABCAYAAACsXeyTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAFUlEQVQIHWNIS0sr/v//PwMMDzY+ADqMahlW4J91AAAAAElFTkSuQmCC') top left repeat-x;
-  padding-top: 0em;
+  padding-top: 0.4em;
   padding-bottom: 0.5em;
   font-size: 0.8em;
 }
@@ -1148,7 +1146,7 @@ pre::-webkit-scrollbar-thumb:horizontal, .highlight::-webkit-scrollbar-thumb:hor
 #blog-archives article:last-child {
   background: none;
 }
-#blog-archives article footer, #blog-archives article p.meta-up {
+#blog-archives article footer {
   padding: 0;
   margin: 0;
 }
@@ -1234,10 +1232,10 @@ pre::-webkit-scrollbar-thumb:horizontal, .highlight::-webkit-scrollbar-thumb:hor
     line-height: 1.1em;
   }
 }
-#blog-archives footer span.info, #blog-archives article p.meta-up span.info, article #blog-archives p.meta-up span.info {
+#blog-archives footer span.info {
   font-size: medium;
 }
-#blog-archives footer span.info a, #blog-archives article p.meta-up span.info a, article #blog-archives p.meta-up span.info a, #blog-archives footer span.info a:hover, #blog-archives article p.meta-up span.info a:hover, article #blog-archives p.meta-up span.info a:hover, #blog-archives footer span.info a:visited, #blog-archives article p.meta-up span.info a:visited, article #blog-archives p.meta-up span.info a:visited {
+#blog-archives footer span.info a, #blog-archives footer span.info a:hover, #blog-archives footer span.info a:visited {
   text-decoration: none;
 }
 
@@ -1432,26 +1430,26 @@ aside.sidebar:hover a:hover {
   font-size: 1em;
 }
 
-body > footer, article body > p.meta-up {
+body > footer {
   font-size: .8em;
   color: #888888;
   position: relative;
   padding: .5em 0;
   z-index: 1;
 }
-body > footer a, article body > p.meta-up a {
+body > footer a {
   color: #8d8d8d;
 }
-body > footer a:visited, article body > p.meta-up a:visited {
+body > footer a:visited {
   color: #8d8d8d;
 }
-body > footer a:hover, article body > p.meta-up a:hover {
+body > footer a:hover {
   color: #484848;
 }
-body > footer p, article body > p.meta-up p {
+body > footer p {
   text-align: center;
 }
-body > footer p:last-child, article body > p.meta-up p:last-child {
+body > footer p:last-child {
   margin-bottom: 0;
 }
 
