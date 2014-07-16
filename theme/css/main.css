@@ -522,13 +522,13 @@ body > nav > ul > li > a {
 }
 @media screen and (max-width: 640px) {
   body > nav > ul > li > a {
-    padding: 6px 8px;
+    padding: 6px 8px 8px;
     font-size: 18px;
   }
 }
 @media screen and (max-width: 480px) {
   body > nav > ul > li > a {
-    padding: 4px 6px;
+    padding: 4px 6px 8px;
     font-size: 16px;
   }
 }
