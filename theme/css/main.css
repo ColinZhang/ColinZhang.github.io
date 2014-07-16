@@ -349,35 +349,58 @@ article blockquote cite:before {
   word-wrap: break-word;
 }
 
-.group, body div.pagination, aside.sidebar, #main, #content, .sidebar {
+.group, #main, #content, .sidebar {
   *zoom: 1;
 }
-.group:after, body div.pagination:after, #main:after, #content:after, .sidebar:after {
+.group:after, #main:after, #content:after, .sidebar:after {
   content: "";
   display: table;
   clear: both;
 }
 
 body {
-  -webkit-text-size-adjust: none;
   position: relative;
   margin: 0 auto;
 }
-body #content > article, body #content > div > article, body #content > div > section {
+body #content > article, body #content > div > article {
   padding-left: 80px;
   padding-right: 80px;
+}
+body > nav, body > footer {
+  margin: 0 auto;
+}
+body > div#main, body > nav, body > footer {
+  width: 900px;
 }
 body div.pagination {
   margin-left: 80px;
   margin-right: 80px;
 }
-body > div {
-  max-width: 900px;
-  min-width: 900px;
+@media screen and (max-width: 980px) {
+  body > div#main, body > nav, body > footer {
+    width: 90%;
+  }
+  body #content > article, body #content > div > article {
+    padding-left: 35px;
+    padding-right: 35px;
+  }
+  body div.pagination {
+    margin-left: 35px;
+    margin-right: 35px;
+  }
 }
-body > nav, body > footer {
-  width: 899px;
-  margin: 0 auto;
+@media screen and (max-width: 640px) {
+  body > div#main, body > nav, body > footer {
+    width: 95%;
+  }
+  body #content > article, body #content > div > article {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+  body div.pagination {
+    margin-left: 25px;
+    margin-right: 25px;
+  }
 }
 
 #content {
@@ -386,13 +409,6 @@ body > nav, body > footer {
 }
 #content > div, #content > article {
   width: 100%;
-}
-
-aside.sidebar {
-  float: none;
-  padding: 0 18px 1px;
-  background-color: #f7f7f7;
-  border-top: 1px solid #e0e0e0;
 }
 
 .flex-content, aside.sidebar img {
@@ -414,21 +430,6 @@ aside.sidebar {
 }
 .basic-alignment.left, aside.sidebar img.left, .basic-alignment.right, aside.sidebar img.right {
   margin-bottom: .8em;
-}
-
-.toggle-sidebar, .no-sidebar .toggle-sidebar {
-  display: none;
-}
-
-body.sidebar-footer #content {
-  margin-right: 0px;
-}
-body.sidebar-footer .toggle-sidebar {
-  display: none;
-}
-
-body {
-  -webkit-text-size-adjust: auto;
 }
 
 #main {
@@ -456,7 +457,7 @@ body > header h1, body > header h2 {
   display: none;
 }
 body > header div#logo {
-  width: 740px;
+  width: 900px;
   margin: 0 auto;
   display: block;
   -webkit-box-sizing: border-box;
@@ -464,8 +465,20 @@ body > header div#logo {
   box-sizing: border-box;
   background: url('../images/logo.png?1405443486') no-repeat;
   background-size: auto 70px;
-  background-position: center left;
+  background-position: 80px 10px;
   height: 90px;
+}
+@media screen and (max-width: 980px) {
+  body > header div#logo {
+    width: 90%;
+    background-position: 35px 10px;
+  }
+}
+@media screen and (max-width: 640px) {
+  body > header div#logo {
+    width: 100%;
+    background-position: center center;
+  }
 }
 
 body > nav {
@@ -506,6 +519,18 @@ body > nav > ul > li > a {
   border: none;
   box-shadow: none;
   text-shadow: none;
+}
+@media screen and (max-width: 640px) {
+  body > nav > ul > li > a {
+    padding: 6px 8px;
+    font-size: 18px;
+  }
+}
+@media screen and (max-width: 480px) {
+  body > nav > ul > li > a {
+    padding: 4px 6px;
+    font-size: 16px;
+  }
 }
 body > nav > ul > li > a:visited {
   color: #888888;
@@ -648,7 +673,6 @@ article > footer p.meta {
 }
 
 #content div.pagination {
-  text-align: center;
   position: relative;
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAABCAYAAACsXeyTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAFUlEQVQIHWNIS0sr/v//PwMMDzY+ADqMahlW4J91AAAAAElFTkSuQmCC') top left repeat-x;
   padding-top: 0.4em;
