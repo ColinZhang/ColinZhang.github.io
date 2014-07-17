@@ -381,12 +381,12 @@ body div.pagination {
     width: 90%;
   }
   body #content > article, body #content > div > article {
-    padding-left: 55px;
-    padding-right: 55px;
+    padding-left: 50px;
+    padding-right: 50px;
   }
   body div.pagination {
-    margin-left: 55px;
-    margin-right: 55px;
+    margin-left: 50px;
+    margin-right: 50px;
   }
 }
 @media screen and (max-width: 640px) {
@@ -394,12 +394,12 @@ body div.pagination {
     width: 95%;
   }
   body #content > article, body #content > div > article {
-    padding-left: 35px;
-    padding-right: 35px;
+    padding-left: 25px;
+    padding-right: 25px;
   }
   body div.pagination {
-    margin-left: 35px;
-    margin-right: 35px;
+    margin-left: 25px;
+    margin-right: 25px;
   }
 }
 
@@ -466,7 +466,7 @@ body > header div#logo {
 @media screen and (max-width: 980px) {
   body > header div#logo {
     width: 90%;
-    background-position: 55px 10px;
+    background-position: 50px 10px;
   }
 }
 @media screen and (max-width: 640px) {
@@ -1134,7 +1134,7 @@ pre::-webkit-scrollbar-thumb:horizontal, .highlight::-webkit-scrollbar-thumb:hor
   -webkit-border-top-right-radius: 5px;
   border-top-right-radius: 5px;
   font-family: "Helvetica Neue", Arial, "Lucida Grande", "Lucida Sans Unicode", Lucida, sans-serif;
-  background: #aaaaaa url('../images/code_bg.png') top repeat-x;
+  background: #aaaaaa url('../images/code_bg.png?1405427223') top repeat-x;
   border: 1px solid #565656;
   border-top-color: #cbcbcb;
   border-left-color: #a5a5a5;
