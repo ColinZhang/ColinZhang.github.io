@@ -370,7 +370,7 @@ body > nav, body > footer {
   margin: 0 auto;
 }
 body > div#main, body > nav, body > footer {
-  width: 900px;
+  width: 880px;
 }
 body div.pagination {
   margin-left: 80px;
@@ -378,7 +378,7 @@ body div.pagination {
 }
 @media screen and (max-width: 980px) {
   body > div#main, body > nav, body > footer {
-    width: 90%;
+    width: 85%;
   }
   body #content > article, body #content > div > article {
     padding-left: 60px;
@@ -465,7 +465,7 @@ body > header h1, body > header h2 {
   display: none;
 }
 body > header div#logo {
-  width: 900px;
+  width: 880px;
   margin: 0 auto;
   display: block;
   -webkit-box-sizing: border-box;
@@ -490,9 +490,14 @@ body > header div#logo {
 }
 
 body > nav {
-  padding: 10px 0;
   text-align: center;
   background: #f8f8f8 url('../images/noise.png?1405427223') top left;
+  padding: 10px 0 0;
+}
+@media screen and (max-width: 640px) {
+  body > nav {
+    padding: 5px 0 0;
+  }
 }
 body > nav > ul {
   list-style: none;
@@ -537,13 +542,13 @@ body > nav > ul > li > a {
 @media screen and (max-width: 640px) {
   body > nav > ul > li > a {
     padding: 6px 8px 6px;
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 @media screen and (max-width: 480px) {
   body > nav > ul > li > a {
     padding: 4px 6px 2px;
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 body > nav > ul > li > a:visited {
@@ -577,6 +582,21 @@ body > nav ul li.last > a:after, body > nav ul li:last-child > a:after {
 article {
   padding-top: 20px;
   /* should be useless */
+}
+@media screen and (max-width: 980px) {
+  article {
+    padding: 10px;
+  }
+}
+@media screen and (max-width: 640px) {
+  article {
+    padding: 5px;
+  }
+}
+@media screen and (max-width: 480px) {
+  article {
+    padding: 0px;
+  }
 }
 article header {
   padding-top: 0px;
@@ -641,8 +661,26 @@ article > footer p.meta {
   padding-bottom: 0;
 }
 #content .blog-index article {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 15px;
+  padding-bottom: 16px;
+}
+@media screen and (max-width: 980px) {
+  #content .blog-index article {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+@media screen and (max-width: 640px) {
+  #content .blog-index article {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+@media screen and (max-width: 480px) {
+  #content .blog-index article {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
 }
 #content .blog-index article header {
   background: none;
