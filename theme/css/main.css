@@ -381,25 +381,38 @@ body div.pagination {
     width: 90%;
   }
   body #content > article, body #content > div > article {
-    padding-left: 50px;
-    padding-right: 50px;
+    padding-left: 60px;
+    padding-right: 60px;
   }
   body div.pagination {
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 60px;
+    margin-right: 60px;
   }
 }
 @media screen and (max-width: 640px) {
   body > div#main, body > nav, body > footer {
-    width: 95%;
+    width: 93%;
   }
   body #content > article, body #content > div > article {
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-left: 40px;
+    padding-right: 40px;
   }
   body div.pagination {
-    margin-left: 25px;
-    margin-right: 25px;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+}
+@media screen and (max-width: 480px) {
+  body > div#main, body > nav, body > footer {
+    width: 90%;
+  }
+  body #content > article, body #content > div > article {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  body div.pagination {
+    margin-left: 18px;
+    margin-right: 18px;
   }
 }
 
@@ -466,7 +479,7 @@ body > header div#logo {
 @media screen and (max-width: 980px) {
   body > header div#logo {
     width: 90%;
-    background-position: 50px 10px;
+    background-position: 60px 10px;
   }
 }
 @media screen and (max-width: 640px) {
