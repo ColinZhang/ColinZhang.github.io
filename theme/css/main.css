@@ -363,8 +363,8 @@ body {
   min-width: 480px;
 }
 body #content > article, body #content > div > article {
-  padding-left: 55px;
-  padding-right: 55px;
+  padding-left: 80px;
+  padding-right: 80px;
 }
 body > nav, body > footer {
   margin: 0 auto;
@@ -373,12 +373,25 @@ body > div#main, body > nav, body > footer {
   width: 900px;
 }
 body div.pagination {
-  margin-left: 55px;
-  margin-right: 55px;
+  margin-left: 80px;
+  margin-right: 80px;
 }
 @media screen and (max-width: 980px) {
   body > div#main, body > nav, body > footer {
     width: 90%;
+  }
+  body #content > article, body #content > div > article {
+    padding-left: 55px;
+    padding-right: 55px;
+  }
+  body div.pagination {
+    margin-left: 55px;
+    margin-right: 55px;
+  }
+}
+@media screen and (max-width: 640px) {
+  body > div#main, body > nav, body > footer {
+    width: 95%;
   }
   body #content > article, body #content > div > article {
     padding-left: 35px;
@@ -387,19 +400,6 @@ body div.pagination {
   body div.pagination {
     margin-left: 35px;
     margin-right: 35px;
-  }
-}
-@media screen and (max-width: 640px) {
-  body > div#main, body > nav, body > footer {
-    width: 95%;
-  }
-  body #content > article, body #content > div > article {
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-  body div.pagination {
-    margin-left: 25px;
-    margin-right: 25px;
   }
 }
 
@@ -460,13 +460,13 @@ body > header div#logo {
   box-sizing: border-box;
   background: url('../images/logo.png?1405443486') no-repeat;
   background-size: auto 70px;
-  background-position: 55px 10px;
+  background-position: 80px 10px;
   height: 90px;
 }
 @media screen and (max-width: 980px) {
   body > header div#logo {
     width: 90%;
-    background-position: 35px 10px;
+    background-position: 55px 10px;
   }
 }
 @media screen and (max-width: 640px) {
@@ -1134,7 +1134,7 @@ pre::-webkit-scrollbar-thumb:horizontal, .highlight::-webkit-scrollbar-thumb:hor
   -webkit-border-top-right-radius: 5px;
   border-top-right-radius: 5px;
   font-family: "Helvetica Neue", Arial, "Lucida Grande", "Lucida Sans Unicode", Lucida, sans-serif;
-  background: #aaaaaa url('../images/code_bg.png?1405427223') top repeat-x;
+  background: #aaaaaa url('../images/code_bg.png') top repeat-x;
   border: 1px solid #565656;
   border-top-color: #cbcbcb;
   border-left-color: #a5a5a5;
