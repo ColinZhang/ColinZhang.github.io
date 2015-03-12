@@ -26,6 +26,7 @@ pre code {
     -moz-border-radius: 0px;
     -webkit-border-radius: 0px;
     border-radius: 0px;
+    font-size: 11px;
 }
 
 pre, code {
