@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blog on fz84</title>
-    <link>http://bl4ck5un.github.io/categories/blog/</link>
+    <link>/categories/blog/</link>
     <description>Recent content in Blog on fz84</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 19 Apr 2014 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://bl4ck5un.github.io/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>CVE-2013-1763</title>
-      <link>http://bl4ck5un.github.io/post/CVE-2013-1763/</link>
+      <link>/post/CVE-2013-1763/</link>
       <pubDate>Sat, 19 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://bl4ck5un.github.io/post/CVE-2013-1763/</guid>
+      <guid>/post/CVE-2013-1763/</guid>
       <description>
 
 &lt;p&gt;Userland can send a netlink message requesting &lt;code&gt;SOCK_DIAG_BY_FAMILY&lt;/code&gt; with a family greater or equal then &lt;code&gt;AF_MAX&lt;/code&gt; &amp;ndash; the array size of &lt;code&gt;sock_diag_handlers[]&lt;/code&gt;. The current code does not test for this condition therefore is vulnerable to an out-of-bound access opening doors for a privilege escalation.&lt;/p&gt;
@@ -160,10 +160,10 @@ struct unix_diag_req {
     
     <item>
       <title>CVE-2014-0038</title>
-      <link>http://bl4ck5un.github.io/post/CVE-2014-0038/</link>
+      <link>/post/CVE-2014-0038/</link>
       <pubDate>Wed, 16 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://bl4ck5un.github.io/post/CVE-2014-0038/</guid>
+      <guid>/post/CVE-2014-0038/</guid>
       <description>
 
 &lt;p&gt;利用漏洞将 &lt;code&gt;ptmx_fops&lt;/code&gt; 返回函数的高字节置零，让它指向payload。然后payload在被kernel执行，调用 &lt;code&gt;commit_cred&lt;/code&gt; 获取root。&lt;/p&gt;
@@ -288,10 +288,10 @@ kernel_payload(void* foo, void* bar)
     
     <item>
       <title>Why heart bleeds</title>
-      <link>http://bl4ck5un.github.io/post/CVE-2014-0160/</link>
+      <link>/post/CVE-2014-0160/</link>
       <pubDate>Thu, 10 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://bl4ck5un.github.io/post/CVE-2014-0160/</guid>
+      <guid>/post/CVE-2014-0160/</guid>
       <description>
 
 &lt;p&gt;This blog investigated the recently introduced Heartbeat mechanism in TLS, which unfortunately leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability, aka CVE-2014-0160.&lt;/p&gt;
@@ -423,10 +423,10 @@ index b82fada..bddffd9 100644 (file)
     
     <item>
       <title>Python Descriptor by Example</title>
-      <link>http://bl4ck5un.github.io/post/python-descriptor-by-live-example/</link>
+      <link>/post/python-descriptor-by-live-example/</link>
       <pubDate>Wed, 12 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://bl4ck5un.github.io/post/python-descriptor-by-live-example/</guid>
+      <guid>/post/python-descriptor-by-live-example/</guid>
       <description>
 
 &lt;p&gt;Understand how to write and take advantage of Python descriptor by looking into product example from Django source code.&lt;/p&gt;
@@ -503,10 +503,10 @@ class AuthenticationMiddleware(object):
     
     <item>
       <title>Quotation concept in Unix Shell</title>
-      <link>http://bl4ck5un.github.io/post/quotation-in-Unix-shell/</link>
+      <link>/post/quotation-in-Unix-shell/</link>
       <pubDate>Fri, 14 Feb 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://bl4ck5un.github.io/post/quotation-in-Unix-shell/</guid>
+      <guid>/post/quotation-in-Unix-shell/</guid>
       <description>
 
 &lt;p&gt;Tell me how to quote.&lt;/p&gt;

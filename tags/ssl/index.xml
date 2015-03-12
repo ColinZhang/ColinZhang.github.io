@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ssl on fz84</title>
-    <link>http://bl4ck5un.github.io/tags/ssl/</link>
+    <link>/tags/ssl/</link>
     <description>Recent content in Ssl on fz84</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 10 Apr 2014 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://bl4ck5un.github.io/tags/ssl/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/tags/ssl/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Why heart bleeds</title>
-      <link>http://bl4ck5un.github.io/post/CVE-2014-0160/</link>
+      <link>/post/CVE-2014-0160/</link>
       <pubDate>Thu, 10 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://bl4ck5un.github.io/post/CVE-2014-0160/</guid>
+      <guid>/post/CVE-2014-0160/</guid>
       <description>
 
 &lt;p&gt;This blog investigated the recently introduced Heartbeat mechanism in TLS, which unfortunately leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability, aka CVE-2014-0160.&lt;/p&gt;
