@@ -6,8 +6,18 @@
     <description>Recent content on fz84</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 19 Apr 2014 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 12 Mar 2015 11:00:51 -0400</lastBuildDate>
     <atom:link href="http://bl4ck5un.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>I just get a new blog</title>
+      <link>http://bl4ck5un.github.io/post/new-blog/</link>
+      <pubDate>Thu, 12 Mar 2015 11:00:51 -0400</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/new-blog/</guid>
+      <description>&lt;p&gt;Moving from Pelican to Hugo is satisfatory and eays.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>CVE-2013-1763</title>
