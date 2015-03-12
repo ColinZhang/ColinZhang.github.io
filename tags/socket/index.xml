@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Socket on fz84</title>
-    <link>/tags/socket/</link>
+    <link>http://bl4ck5un.github.io/tags/socket/</link>
     <description>Recent content in Socket on fz84</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 16 Apr 2014 00:00:00 +0000</lastBuildDate>
-    <atom:link href="/tags/socket/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://bl4ck5un.github.io/tags/socket/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>CVE-2014-0038</title>
-      <link>/post/CVE-2014-0038/</link>
+      <link>http://bl4ck5un.github.io/post/CVE-2014-0038/</link>
       <pubDate>Wed, 16 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>/post/CVE-2014-0038/</guid>
+      <guid>http://bl4ck5un.github.io/post/CVE-2014-0038/</guid>
       <description>
 
 &lt;p&gt;利用漏洞将 &lt;code&gt;ptmx_fops&lt;/code&gt; 返回函数的高字节置零，让它指向payload。然后payload在被kernel执行，调用 &lt;code&gt;commit_cred&lt;/code&gt; 获取root。&lt;/p&gt;
