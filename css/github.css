@@ -12,7 +12,7 @@ pre {
     margin-bottom: 20px;
 }
 
-code {
+pre code {
     border: 1px solid #eaeaea;
     margin: 0px 2px;
     padding: 0px 5px;
@@ -26,10 +26,9 @@ pre code {
     -moz-border-radius: 0px;
     -webkit-border-radius: 0px;
     border-radius: 0px;
-    font-size: 11px;
 }
 
-pre, code {
+pre code {
     font-family: Consolas, 'Liberation Mono', Courier, monospace;
     color: #333;
     background: #f8f8f8;
