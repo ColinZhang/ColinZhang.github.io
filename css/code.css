@@ -1,9 +1,9 @@
 pre code {
 	font-size: 85%;
-	/*font-family: "Inconsolata";*/
+	font-family: "PT Mono";
 }
 
 pre {
 	padding: 0;
-	margin: 5px;
+	margin: 10px;
 }
