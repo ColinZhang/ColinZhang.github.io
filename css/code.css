@@ -2,6 +2,8 @@
 
 pre code {
 	font-size: 90%;
+	word-wrap: normal;
+	white-space: pre;
 }
 
 pre {
