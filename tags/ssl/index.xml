@@ -102,12 +102,12 @@ tls1_process_heartbeat(SSL *s)
     //... all secrets get sent to client ...
 }
 
-/* fetched from ssl/ssl_locl.h
-  n2s(c, s)
-  s = c[0] || c[1] (|| stands for concatanation)
-  c = c + 2
-*/
-# define n2s(c,s)  ((s=(((unsigned int)(c[0]))&amp;lt;&amp;lt; 8)| (((unsigned int)(c[1])))),c+=2)
+//fetched from ssl/ssl_locl.h
+//  n2s(c, s)
+//  s = c[0] || c[1] (|| stands for concatanation)
+//  c = c + 2
+# define n2s(c,s)  ((s=(((unsigned int)(c[0]))&amp;lt;&amp;lt; 8)| \
+              (((unsigned int)(c[1])))),c+=2)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Suppose we call &lt;code&gt;tls1_process_heartbeat&lt;/code&gt; with the crafted packet &lt;code&gt;&amp;quot;\x18\x03\x02\x00\x03\x01\x40\x00&amp;quot;&lt;/code&gt;. What would happen is:&lt;/p&gt;
