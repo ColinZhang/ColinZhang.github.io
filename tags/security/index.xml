@@ -17,11 +17,13 @@
       <guid>http://fanzy.me/post/CVE-2014-0160/</guid>
       <description>
 
-&lt;p&gt;It&amp;rsquo;s not rare that the critical security infrastructure on which we heavily reply sometimes is broken, in one way or another. This blog investigated the &lt;code&gt;Heartbeat&lt;/code&gt; mechanism in TLS protocol and how it leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability, aka CVE-2014-0160 in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s not rare that the critical security infrastructure on which we heavily rely is sometimes broken, in one way or another. This blog investigated the newly introduced &lt;code&gt;Heartbeat&lt;/code&gt; extension to TLS and how it leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt;, aka CVE-2014-0160.&lt;/p&gt;
 
 &lt;h2 id=&#34;description-from-nvd:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Description from NVD&lt;/h2&gt;
 
+&lt;blockquote&gt;
 &lt;p&gt;The (1) &lt;code&gt;TLS&lt;/code&gt; and (2) &lt;code&gt;DTLS&lt;/code&gt; implementations in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt; before &lt;code&gt;1.0.1g&lt;/code&gt; do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information from process memory via crafted packets that trigger a buffer over-read, as demonstrated by reading private keys, related to &lt;code&gt;d1_both.c&lt;/code&gt; and &lt;code&gt;t1_lib.c&lt;/code&gt;, aka the Heartbleed bug.&lt;/p&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;To &lt;a href=&#34;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0160&#34;&gt;NVD&lt;/a&gt;&lt;/p&gt;
 
