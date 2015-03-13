@@ -15,3 +15,8 @@ pre {
 code {
 	font-family: Menlo, Monaco, monospace;
 }
+
+
+blockqoute > p {
+	margin: 0;
+}
