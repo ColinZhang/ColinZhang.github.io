@@ -116,7 +116,7 @@ tls1_process_heartbeat(SSL *s)
 
 &lt;ol&gt;
 &lt;li&gt;&lt;code&gt;p&lt;/code&gt; points to the beginning of HeartBeat message, i.e. the byte &lt;code&gt;&amp;quot;\x01&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;hbtype := TLS1_HB_REQUEST&lt;/code&gt; and &lt;code&gt;p&lt;/code&gt; points to &lt;code&gt;payload_length&lt;/code&gt;, i.e. `&amp;rdquo;\x40\x00&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hbtype := TLS1_HB_REQUEST&lt;/code&gt; and &lt;code&gt;p&lt;/code&gt; points to &lt;code&gt;payload_length&lt;/code&gt;, i.e. &lt;code&gt;&amp;quot;\x40\x00&amp;quot;&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;payload := 0x4000&lt;/code&gt;, &lt;code&gt;p&lt;/code&gt; nows points to somewhere outside of the packet (note that packet has already ended, there is no payload at all!)&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;memcpy(bp, pl, payload)&lt;/code&gt; actually copied 64 bytes memory from &lt;code&gt;pl&lt;/code&gt;, somewhere in stack, to the response packet that users that see in clear.&lt;/li&gt;
 &lt;/ol&gt;
