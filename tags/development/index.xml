@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Development on fz84</title>
+    <link>http://fanzy.me/tags/development/</link>
+    <description>Recent content in Development on fz84</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 07 Jul 2015 16:58:45 -0400</lastBuildDate>
+    <atom:link href="http://fanzy.me/tags/development/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>SSH behine firewall made easy</title>
+      <link>http://fanzy.me/post/SSH-made-easy/</link>
+      <pubDate>Tue, 07 Jul 2015 16:58:45 -0400</pubDate>
+      
+      <guid>http://fanzy.me/post/SSH-made-easy/</guid>
+      <description>
+
+&lt;h1 id=&#34;settings:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Settings&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;(Desktop)---(Intermediate Server)--- || --- (Remote Server)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;step-by-step-setup:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Step-by-step setup&lt;/h1&gt;
+
+&lt;h2 id=&#34;setup-reverse-tunnel:f8b878aefe833ac195c03c37c2641d27&#34;&gt;setup reverse tunnel&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;on CU desktop&lt;/p&gt;
+
+&lt;p&gt;ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;To test whether reverse tunnel works, on AWS Server:&lt;/p&gt;
+
+&lt;p&gt;ssh fanz@localhost -p 7000.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If prompted with login. Works.&lt;/p&gt;
+
+&lt;h2 id=&#34;setup-proxycommand:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Setup &lt;code&gt;ProxyCommand&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;on Laptop, add the following to ~/.ssh/config&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host aws-ssh
+    HostName 52.10.241.71
+    User ec2-user
+    IdentityFile ~/Dropbox/keys/Fan.pem
+
+Host cs
+    User fanz
+    ProxyCommand ssh -W localhost:7000 aws-ssh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, simply try &lt;code&gt;ssh cs&lt;/code&gt;. Should works!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

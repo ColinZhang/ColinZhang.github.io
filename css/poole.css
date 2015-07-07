@@ -193,11 +193,6 @@ blockquote {
 blockquote p:last-child {
   margin-bottom: 0;
 }
-
-blockquote p:first-child {
-  margin-top: 0;
-}
-
 @media (min-width: 30rem) {
   blockquote {
     padding-right: 5rem;

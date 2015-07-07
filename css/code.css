@@ -1,22 +1,12 @@
 /*final word about code highlight*/
 
 pre code {
-	font-size: 90%;
-	word-wrap: normal;
-	white-space: pre;
+	font-size: 13px;
+	font-family: Menlo, Monaco, monospace;
 }
 
 pre {
 	padding: 10px;
 	margin: 0;
 	/*border: 1px solid #ccc;*/
-}
-
-code {
-	font-family: Menlo, Monaco, monospace;
-}
-
-
-blockqoute  p {
-	margin: 0;
 }

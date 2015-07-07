@@ -6,8 +6,55 @@
     <description>Recent content on fz84</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 12 Mar 2015 11:00:51 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jul 2015 16:58:45 -0400</lastBuildDate>
     <atom:link href="http://fanzy.me/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>SSH behine firewall made easy</title>
+      <link>http://fanzy.me/post/SSH-made-easy/</link>
+      <pubDate>Tue, 07 Jul 2015 16:58:45 -0400</pubDate>
+      
+      <guid>http://fanzy.me/post/SSH-made-easy/</guid>
+      <description>
+
+&lt;h1 id=&#34;settings:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Settings&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;(Desktop)---(Intermediate Server)--- || --- (Remote Server)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;step-by-step-setup:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Step-by-step setup&lt;/h1&gt;
+
+&lt;h2 id=&#34;setup-reverse-tunnel:f8b878aefe833ac195c03c37c2641d27&#34;&gt;setup reverse tunnel&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;on CU desktop&lt;/p&gt;
+
+&lt;p&gt;ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;To test whether reverse tunnel works, on AWS Server:&lt;/p&gt;
+
+&lt;p&gt;ssh fanz@localhost -p 7000.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If prompted with login. Works.&lt;/p&gt;
+
+&lt;h2 id=&#34;setup-proxycommand:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Setup &lt;code&gt;ProxyCommand&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;on Laptop, add the following to ~/.ssh/config&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host aws-ssh
+    HostName 52.10.241.71
+    User ec2-user
+    IdentityFile ~/Dropbox/keys/Fan.pem
+
+Host cs
+    User fanz
+    ProxyCommand ssh -W localhost:7000 aws-ssh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, simply try &lt;code&gt;ssh cs&lt;/code&gt;. Should works!&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>I just get a new blog</title>
@@ -27,13 +74,11 @@
       <guid>http://fanzy.me/post/CVE-2014-0160/</guid>
       <description>
 
-&lt;p&gt;It&amp;rsquo;s not rare that the critical security infrastructure on which we heavily rely is sometimes broken, in one way or another. This blog investigated the newly introduced &lt;code&gt;Heartbeat&lt;/code&gt; extension to TLS and how it leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt;, aka CVE-2014-0160.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s not rare that the critical security infrastructure on which we heavily reply sometimes is broken, in one way or another. This blog investigated the &lt;code&gt;Heartbeat&lt;/code&gt; mechanism in TLS protocol and how it leads to the widely spread &lt;strong&gt;HeartBleed&lt;/strong&gt; vulnerability, aka CVE-2014-0160 in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;description-from-nvd:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Description from NVD&lt;/h2&gt;
 
-&lt;blockquote&gt;
 &lt;p&gt;The (1) &lt;code&gt;TLS&lt;/code&gt; and (2) &lt;code&gt;DTLS&lt;/code&gt; implementations in &lt;code&gt;OpenSSL 1.0.1&lt;/code&gt; before &lt;code&gt;1.0.1g&lt;/code&gt; do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information from process memory via crafted packets that trigger a buffer over-read, as demonstrated by reading private keys, related to &lt;code&gt;d1_both.c&lt;/code&gt; and &lt;code&gt;t1_lib.c&lt;/code&gt;, aka the Heartbleed bug.&lt;/p&gt;
-&lt;/blockquote&gt;
 
 &lt;p&gt;To &lt;a href=&#34;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0160&#34;&gt;NVD&lt;/a&gt;&lt;/p&gt;
 
@@ -126,7 +171,7 @@ tls1_process_heartbeat(SSL *s)
 
 &lt;ol&gt;
 &lt;li&gt;&lt;code&gt;p&lt;/code&gt; points to the beginning of HeartBeat message, i.e. the byte &lt;code&gt;&amp;quot;\x01&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;hbtype := TLS1_HB_REQUEST&lt;/code&gt; and &lt;code&gt;p&lt;/code&gt; points to &lt;code&gt;payload_length&lt;/code&gt;, i.e. &lt;code&gt;&amp;quot;\x40\x00&amp;quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hbtype := TLS1_HB_REQUEST&lt;/code&gt; and &lt;code&gt;p&lt;/code&gt; points to &lt;code&gt;payload_length&lt;/code&gt;, i.e. `&amp;rdquo;\x40\x00&amp;rdquo;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;payload := 0x4000&lt;/code&gt;, &lt;code&gt;p&lt;/code&gt; nows points to somewhere outside of the packet (note that packet has already ended, there is no payload at all!)&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;memcpy(bp, pl, payload)&lt;/code&gt; actually copied 64 bytes memory from &lt;code&gt;pl&lt;/code&gt;, somewhere in stack, to the response packet that users that see in clear.&lt;/li&gt;
 &lt;/ol&gt;

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
-  <title> I just get a new blog &middot; fz84 </title>
+  <title> SSH behine firewall made easy &middot; fz84 </title>
 
   
   <link rel="stylesheet" href="http://fanzy.me/css/poole.css">
@@ -60,9 +60,46 @@
 
 <div class="content container">
 <div class="post">
-  <h1>I just get a new blog</h1>
-  <span class="post-date">Thu, Mar 12, 2015</span>
-      <p>Moving from Pelican to Hugo is satisfatory and eays.</p>
+  <h1>SSH behine firewall made easy</h1>
+  <span class="post-date">Tue, Jul 7, 2015</span>
+      
+
+<h1 id="settings:f8b878aefe833ac195c03c37c2641d27">Settings</h1>
+
+<pre><code>(Desktop)---(Intermediate Server)--- || --- (Remote Server)
+</code></pre>
+
+<h1 id="step-by-step-setup:f8b878aefe833ac195c03c37c2641d27">Step-by-step setup</h1>
+
+<h2 id="setup-reverse-tunnel:f8b878aefe833ac195c03c37c2641d27">setup reverse tunnel</h2>
+
+<ol>
+<li><p>on CU desktop</p>
+
+<p>ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71</p></li>
+
+<li><p>To test whether reverse tunnel works, on AWS Server:</p>
+
+<p>ssh fanz@localhost -p 7000.</p></li>
+</ol>
+
+<p>If prompted with login. Works.</p>
+
+<h2 id="setup-proxycommand:f8b878aefe833ac195c03c37c2641d27">Setup <code>ProxyCommand</code></h2>
+
+<p>on Laptop, add the following to ~/.ssh/config</p>
+
+<pre><code>Host aws-ssh
+    HostName 52.10.241.71
+    User ec2-user
+    IdentityFile ~/Dropbox/keys/Fan.pem
+
+Host cs
+    User fanz
+    ProxyCommand ssh -W localhost:7000 aws-ssh
+</code></pre>
+
+<p>Then, simply try <code>ssh cs</code>. Should works!</p>
 
 </div>
 
