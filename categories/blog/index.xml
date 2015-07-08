@@ -29,11 +29,13 @@
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;on CU desktop&lt;/p&gt;
 
-&lt;p&gt;ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71&lt;/p&gt;&lt;/li&gt;
+&lt;pre&gt;&lt;code&gt;ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;To test whether reverse tunnel works, on AWS Server:&lt;/p&gt;
 
-&lt;p&gt;ssh fanz@localhost -p 7000.&lt;/p&gt;&lt;/li&gt;
+&lt;pre&gt;&lt;code&gt;ssh fanz@localhost -p 7000 
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;If prompted with login. Works.&lt;/p&gt;

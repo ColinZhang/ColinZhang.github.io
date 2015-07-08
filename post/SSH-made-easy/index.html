@@ -49,8 +49,6 @@
       
         <li><a href="/post/"> Blogs </a></li>
       
-        <li><a href="/post/SSH-made-easy/"> SSH behine firewall made easy </a></li>
-      
     </ul>
 
     <p>&copy; 2015. All rights reserved. </p>
@@ -76,11 +74,13 @@
 <ol>
 <li><p>on CU desktop</p>
 
-<p>ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71</p></li>
+<pre><code>ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71
+</code></pre></li>
 
 <li><p>To test whether reverse tunnel works, on AWS Server:</p>
 
-<p>ssh fanz@localhost -p 7000.</p></li>
+<pre><code>ssh fanz@localhost -p 7000 
+</code></pre></li>
 </ol>
 
 <p>If prompted with login. Works.</p>
