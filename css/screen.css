@@ -749,3 +749,8 @@ img[alt=email] {
   display: inline;
   vertical-align: middle;
 }
+
+/* line 6, ../../compass/sass/_custom.scss */
+h2.index-title {
+  font-family: "Patrick Hand";
+}
