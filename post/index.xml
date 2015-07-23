@@ -112,7 +112,7 @@ Host cs
 
 &lt;h2 id=&#34;scene-of-the-accident:ce6f2c75e20b8ec034404887a73bf817&#34;&gt;Scene of the accident&lt;/h2&gt;
 
-&lt;p&gt;So here is the vulnerable code in OpenSSL 1.0.1. Let&amp;rsquo;s check step by step to see what would happen when server receives the following &lt;code&gt;message&lt;/code&gt;:&lt;code&gt;char* message = &amp;quot;\x18\x03\x02\x00\x03\x01\x40\x00&amp;quot;&lt;/code&gt;. A few legends,&lt;/p&gt;
+&lt;p&gt;So here is the vulnerable code in OpenSSL 1.0.1. Let&amp;rsquo;s check step by step to see what would happen when server receives the following message:&lt;code&gt;&amp;quot;\x18\x03\x02\x00\x03\x01\x40\x00&amp;quot;&lt;/code&gt;. A few legends,&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;18&lt;/code&gt;   : Content type::Heartbeat&lt;/li&gt;
@@ -173,7 +173,7 @@ tls1_process_heartbeat(SSL *s)
 
 &lt;ol&gt;
 &lt;li&gt;&lt;code&gt;p&lt;/code&gt; points to the beginning of HeartBeat message, i.e. the byte &lt;code&gt;&amp;quot;\x01&amp;quot;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;hbtype := TLS1_HB_REQUEST&lt;/code&gt; and &lt;code&gt;p&lt;/code&gt; points to &lt;code&gt;payload_length&lt;/code&gt;, i.e. `&amp;rdquo;\x40\x00&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hbtype := TLS1_HB_REQUEST&lt;/code&gt; and &lt;code&gt;p&lt;/code&gt; points to &lt;code&gt;payload_length&lt;/code&gt;, i.e. &lt;code&gt;&amp;quot;\x40\x00&amp;quot;&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;payload := 0x4000&lt;/code&gt;, &lt;code&gt;p&lt;/code&gt; nows points to somewhere outside of the packet (note that packet has already ended, there is no payload at all!)&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;memcpy(bp, pl, payload)&lt;/code&gt; actually copied 64 bytes memory from &lt;code&gt;pl&lt;/code&gt;, somewhere in stack, to the response packet that users that see in clear.&lt;/li&gt;
 &lt;/ol&gt;
