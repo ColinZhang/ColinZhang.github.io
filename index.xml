@@ -457,21 +457,6 @@ quotation&lt;/strong&gt; later.&lt;/p&gt;
     </item>
     
     <item>
-      <title>Home</title>
-      <link>http://fanzy.me/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://fanzy.me/</guid>
-      <description>
-
-&lt;h1 id=&#34;mie:d680e8a854a7cbad6d490c445cba2eba&#34;&gt;Mie&lt;/h1&gt;
-
-&lt;p&gt;I&amp;rsquo;m a developer and PhD student at Department of CS, Cornell University, USA.
-I read, write and do research in systems and security. This is my blog.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
       <title>About</title>
       <link>http://fanzy.me/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -484,6 +469,21 @@ I read, write and do research in systems and security. This is my blog.&lt;/p&gt
 &lt;p&gt;In a nutshell, this blog serves as a collection of my random thoughts.&lt;/p&gt;
 
 &lt;h2 id=&#34;me:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Me&lt;/h2&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Home</title>
+      <link>http://fanzy.me/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://fanzy.me/</guid>
+      <description>
+
+&lt;h1 id=&#34;mie:d680e8a854a7cbad6d490c445cba2eba&#34;&gt;Mie&lt;/h1&gt;
+
+&lt;p&gt;I&amp;rsquo;m a developer and PhD student at Department of CS, Cornell University, USA.
+I read, write and do research in systems and security. This is my blog.&lt;/p&gt;
 </description>
     </item>
     

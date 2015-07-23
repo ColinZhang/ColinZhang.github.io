@@ -33,13 +33,17 @@
 
 html {
   font-family: "PT Sans", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
 }
-@media (min-width: 48rem) {
+
+@media (min-width: 32rem) {
   html {
     font-size: 18px;
   }
 }
-@media (min-width: 72rem) {
+
+@media (min-width: 48rem) {
   html {
     font-size: 20px;
   }
@@ -52,7 +56,6 @@ html {
  * Flexible banner for housing site name, intro, and "footer" content. Starts
  * out above content in mobile and later moves to the side with wider viewports.
  */
-
 
 .sidebar {
   text-align: center;
@@ -72,6 +75,10 @@ html {
   margin-top: 0;
   font-family: "Abril Fatface", serif;
   font-size: 3.25rem;
+}
+
+.sidebar-about p {
+    font-size: 1.1rem;
 }
 
 /* Sidebar nav */
@@ -95,11 +102,16 @@ a.sidebar-nav-item:focus {
 @media (min-width: 48rem){
     .sidebar {
         position: fixed;
-        top: 0;
+        top: 0rem;
         left: 0;
         bottom: 0;
-        width: 18rem;
+        width: 16rem;
         text-align: left;
+    }
+
+    .sidebar .container {
+        position: absolute;
+        bottom: 0;
     }
 }
 
@@ -108,20 +120,18 @@ a.sidebar-nav-item:focus {
 @media (max-width: 48rem) {
     /* when on the top */
     .sidebar {
-        padding: 0;
+        padding: 0; margin: 0;
     }
     
     .sidebar-about h1 {
-        margin: 0;
-        padding: 5px;
+        padding: 3px 0; margin: 0;
     }
     .sidebar-about p {
         display: none;
     }
 
     ul.sidebar-nav {
-        margin: 0;
-        padding: 5px 0;
+        margin: 0; padding: 0;
     }
 
     ul.sidebar-nav li {
@@ -137,7 +147,8 @@ a.sidebar-nav-item:focus {
     }
 
     p.sidebar-copyright {
-        display: none;
+        padding: .5em 0; margin: 0;
+        font-size: .7em;
     }
 }
 
@@ -148,6 +159,7 @@ a.sidebar-nav-item:focus {
  * contents to the bottom of the sidebar in tablets and up.
  */
 
+/* for larger screen */
 @media (min-width: 48rem) {
   .sidebar-sticky {
     position: absolute;
@@ -164,27 +176,27 @@ a.sidebar-nav-item:focus {
  * with a 25%-wide `.sidebar`.
  */
 
-.content {
-  padding-top:    4rem;
-  padding-bottom: 4rem;
+
+/* for small screen */
+@media (max-width: 48rem) {
+    .content {
+      padding-top:    1.5rem;
+      padding-bottom: 1.5rem;
+      padding-left:   2rem;
+      padding-right:  2rem;
+    }
 }
+
 
 @media (min-width: 48rem) {
   .content {
     max-width: 38rem;
     margin-left: 20rem;
     margin-right: 2rem;
+    padding-top:    3rem;
+    padding-bottom: 3rem;
   }
 }
-
-@media (min-width: 72rem) {
-  .content {
-    margin-left: 22rem;
-    margin-right: 4rem;
-  }
-}
-
-
 
 
 /*
