@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+      <title> Quotation concept in Unix Shell &middot; fz84 </title>
+  
+
+  
+  <link rel="stylesheet" href="http://fanzy.me/css/poole.css">
+  <link rel="stylesheet" href="http://fanzy.me/css/hyde.css">
+  <link rel="stylesheet" href="http://fanzy.me/css/fz84.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+    
+  
+
+
+
+<link href="/css/themes/blackboard.css" rel="stylesheet" type="text/css">
+<script src="/js/rainbow-custom.min.js"></script>
+<script src="/js/rainbow.linenumbers.min.js"></script>
+
+<link rel="stylesheet" href="/css/code.css">
+
+
+  
+  <link rel="stylesheet" href="http://fanzy.me/font-awesome/css/font-awesome.min.css">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="fz84" />
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="container"> 
+    <div class="sidebar-about">
+      <h1>fz84</h1>
+      <p class="lead">
+       
+        Read, write and do research in systems and security 
+      
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/about/"> About </a></li>
+      
+        <li><a href="/post/"> Blogs </a></li>
+      
+    </ul>
+
+    <p class="sidebar-copyright">
+    &copy; 2015. All rights reserved. </p>
+  </div>
+</div>
+
+
+<div class="content container">
+<div class="post">
+  <h1>Quotation concept in Unix Shell</h1>
+   
+  <span class="post-date">Fri, Feb 14, 2014</span>
+  
+
+      
+
+<p>Tell me how to quote.</p>
+
+<p>The basic actions of the shell are simple. It reads a line. This is
+either from a file, a script, or from a user.</p>
+
+<ul>
+<li>First, meta-characters are &ldquo;handled.&rdquo;</li>
+<li>Second, the name of the executable is found.</li>
+<li>Third, the arguments are passed to the program.</li>
+<li>Fourth, the file redirection is setup.</li>
+<li>Lastly, the program is executed.</li>
+</ul>
+
+<h2 id="meta-characters-and-filename-expansion:306ff65f81e8cfdac085c6fa77a5f38f">Meta-characters and Filename expansion</h2>
+
+<p>This includes <strong>variable evaluation</strong> (variables start with a <code>$</code>), and
+<strong>filename expansion</strong>.</p>
+
+<h2 id="quotation:306ff65f81e8cfdac085c6fa77a5f38f">Quotation</h2>
+
+<p>Why quote at all, and what do I mean by quoting? Well, the shell
+understands many special characters, called <code>meta-characters</code>. These
+each have a purpose, and there are so many, beginners often suffer from
+meta-itis. Example: The dollar sign(<code>$</code>) is a meta-character, and tells
+the shell the next word is a variable. If you wanted to use the dollar
+sign as a regular character, how can you tell the shell the dollar sign
+does not indicate a variable? Answer: the dollar sign must be
+<strong>quoted</strong>. Why? <strong>Quoted characters do not have a special meaning.</strong></p>
+
+<blockquote>
+<p>Quoted characters do not have a special meaning.</p>
+</blockquote>
+
+<p>A surprising number of characters have special meanings. The lowly
+space, often forgotten in many books, is an extremely important
+meta-character. Consider the following</p>
+
+<pre><code class="language-shell">rm -i file1 file2
+</code></pre>
+
+<p>The shell breaks this line up to four words, which can be logically
+divided into two classes.</p>
+
+<ol>
+<li><code>rm</code> is program to execute</li>
+<li><code>-i</code>, <code>file1</code>, <code>file2</code> are parameters or arguments, which will be
+passed to <code>rm</code> before it runs.</li>
+</ol>
+
+<p>To shell, there is no difference between <code>-i</code> and <code>file1</code>, except that
+it follows convention that options begin with a hyphen, like <code>-i</code>. All
+shell cares is to extract four words from the line, then find the
+executable <code>rm</code> and pass the other three parameters to it. However, when
+you input the quoted version, it will be another story</p>
+
+<pre><code class="language-shell">rm -i 'file1 file2'
+</code></pre>
+
+<p>Note that, &ldquo;quoted characters do not have a special meaning&rdquo; , so does
+the space between &lsquo;file1&rsquo; and &lsquo;file2&rsquo;. DO NOT perceive &lsquo;file1 file2&rsquo; as
+a string in C or any other programming languages. <strong>There is no concept
+of C-like string in shell</strong> and don&rsquo;t even try to make the metaphor,
+which is often overlooked by beginners yet extremely important to keep
+in mind, in order to understand quotation correctly.</p>
+
+<p>A more accurate description of the quoting is a <strong>switch</strong>, or toggle &ndash;
+it turns on and off the quotation status whether the meta-characters
+within text are getting to be interpreted. Therefore, following
+variations are all equivalent</p>
+
+<pre><code class="language-shell">rm 'file1 file2'
+rm file1' 'file2
+rm f'ile1 file'2
+</code></pre>
+
+<p>Just remember: There is NO concept of string in shell at all.</p>
+
+<h2 id="strong-versus-weak-quoting:306ff65f81e8cfdac085c6fa77a5f38f">Strong versus weak quoting</h2>
+
+<p>Simple enough,</p>
+
+<ul>
+<li><code>&quot;</code> is weakest: backslash(<code>\</code>), dollar sign(<code>$</code>), and the
+back-stick(``) all keep effective inside the double quotation.</li>
+<li><code>'</code> is strongest: single quotation returns everything inside the
+quotation literally.</li>
+</ul>
+
+<h2 id="nested-quotation:306ff65f81e8cfdac085c6fa77a5f38f">Nested quotation</h2>
+
+<p>Once you have fully understood that The quotation marks in the Bourne
+shell are not used to define a string, but to <strong>disable</strong> or <strong>enable</strong>
+interpretation of meta-characters, it&rsquo;s easy and intuitive to play with
+so called &lsquo;nested quotation&rsquo;</p>
+
+<pre><code class="language-shell">$ echo 'Strong quotes use '&quot;'&quot;' and weak quotes use &quot;'
+Strong quotes use ' and weak quotes use &quot;
+</code></pre>
+
+<p>Above example tells all story about nested quotation. Equivalently</p>
+
+<pre><code class="language-shell">$ echo '&quot;'&quot;'&quot;
+</code></pre>
+
+<p>simply gives <code>&quot;'</code>.</p>
+
+<h2 id="some-tricky-cases:306ff65f81e8cfdac085c6fa77a5f38f">some tricky cases</h2>
+
+<p>There are always chances for you to use nested quotation in composing a
+program. What makes it tricky is that the order of quotation matters,
+let&rsquo;s look at something live</p>
+
+<pre><code class="language-shell">$perl -e &quot;print('hello world')&quot;
+hello world$
+</code></pre>
+
+<p>Printing hello world as we excepted, but Where is the \$ from? No magic,
+it is the beginning of the next line, because the absence of
+<code>line switch</code> at the tail of &lsquo;hello world&rsquo;. You might think following is
+fine</p>
+
+<pre><code class="language-shell">$perl -e &quot;print('hello world\n')&quot;
+hello world\n$
+</code></pre>
+
+<p>But it isn&rsquo;t. Single quotation scapes &lsquo;n&rsquo; as Perl string syntax
+specified (NOTE, n is an escape chatachter defined by programing
+language, which has nothing to do with quotation in shell). In this
+cases, following is the way to set it right</p>
+
+<pre><code class="language-shell">$perl -e 'print(&quot;hello world\n&quot;)'
+hello world
+</code></pre>
+
+<p>Another question worthy of thinking is, will
+<code>perl -e print(&quot;hello world\n&quot;)</code> works? Now that <code>'a'</code> has no difference
+with <code>a</code> to shell, why <code>'print(&quot;hello world\n&quot;)'</code> works while
+<code>print(&quot;hello world\n&quot;)</code> doesn&rsquo;t? Here is the result</p>
+
+<pre><code class="language-shell">$perl -e print(&quot;hello world\n&quot;)
+Unknown file attribute.
+</code></pre>
+
+<h2 id="what-s-next:306ff65f81e8cfdac085c6fa77a5f38f">What&rsquo;s next</h2>
+
+<p>I&rsquo;m planning to write something about <strong>escape character versus
+quotation</strong> later.</p>
+
+</div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'FZ84';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</div>
+</body>
+</html>
