@@ -157,12 +157,15 @@ pre {
   word-break: break-all;
   word-wrap: break-word;
   background-color: #f9f9f9;
+  overflow: scroll;
 }
 pre code {
   padding: 0;
   font-size: 95%;
   color: inherit;
   background-color: transparent;
+  word-wrap: normal;
+  white-space: pre;
 }
 .highlight {
   margin-bottom: 1rem;
