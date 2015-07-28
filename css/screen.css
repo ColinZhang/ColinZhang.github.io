@@ -531,13 +531,13 @@ a.sidebar-nav-item:focus {
   padding: 2rem;
 }
 
+/* sidebar ON THE LEFT */
 @media (min-width: 720px) {
-  /* line 13, ../../compass/sass/_container.scss */
+  /* line 15, ../../compass/sass/_container.scss */
   .content {
     max-width: 38rem;
     margin-left: 18rem;
-    /* margin-right: 2rem;
-    */
+    padding: 2rem 4rem;
   }
 }
 /* Code */
@@ -752,4 +752,153 @@ img[alt=email] {
 /* line 6, ../../compass/sass/_custom.scss */
 h1.title, h2.title {
   font-family: "Patrick Hand";
+}
+
+/* Lists */
+/* line 2, ../../compass/sass/_style.scss */
+ul, ol, dl {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* line 7, ../../compass/sass/_style.scss */
+dt {
+  font-weight: bold;
+}
+
+/* line 10, ../../compass/sass/_style.scss */
+dd {
+  margin-bottom: .5rem;
+}
+
+/* Misc */
+/* line 15, ../../compass/sass/_style.scss */
+hr {
+  position: relative;
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #fff;
+}
+
+/* line 23, ../../compass/sass/_style.scss */
+abbr {
+  font-size: 85%;
+  font-weight: bold;
+  color: #555;
+  text-transform: uppercase;
+}
+
+/* line 29, ../../compass/sass/_style.scss */
+abbr[title] {
+  cursor: help;
+  border-bottom: 1px dotted #e5e5e5;
+}
+
+/* Quotes */
+/* line 35, ../../compass/sass/_style.scss */
+blockquote {
+  padding: .5rem 1rem;
+  margin: .8rem 0;
+  color: #7a7a7a;
+  border-left: .25rem solid #e5e5e5;
+}
+
+/* line 41, ../../compass/sass/_style.scss */
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 30rem) {
+  /* line 45, ../../compass/sass/_style.scss */
+  blockquote {
+    padding-right: 5rem;
+    padding-left: 1.25rem;
+  }
+}
+/* line 51, ../../compass/sass/_style.scss */
+img {
+  display: block;
+  margin: 1rem auto;
+  border: 1px solid #e5e5e5;
+  max-width: 90%;
+}
+
+/* Tables */
+/* line 59, ../../compass/sass/_style.scss */
+table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 1px solid #e5e5e5;
+  border-collapse: collapse;
+}
+
+/* line 65, ../../compass/sass/_style.scss */
+td,
+th {
+  padding: .25rem .5rem;
+  border: 1px solid #e5e5e5;
+}
+
+/* line 70, ../../compass/sass/_style.scss */
+tbody tr:nth-child(odd) td,
+tbody tr:nth-child(odd) th {
+  background-color: #f9f9f9;
+}
+
+/*
+ * Custom type
+ *
+ * Extend paragraphs with `.lead` for larger introductory text.
+ */
+/* line 82, ../../compass/sass/_style.scss */
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+/*
+ * Messages
+ *
+ * Show alert messages to users. You may add it to single elements like a `<p>`,
+ * or to a parent if there are multiple elements to show.
+ */
+/* line 95, ../../compass/sass/_style.scss */
+.message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  color: #717171;
+  background-color: #f9f9f9;
+}
+
+/*
+ * Masthead
+ *
+ * Super small header above the content for site name and short description.
+ */
+/* line 109, ../../compass/sass/_style.scss */
+.masthead {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 3rem;
+}
+
+/* line 114, ../../compass/sass/_style.scss */
+.masthead-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #505050;
+}
+
+/* line 119, ../../compass/sass/_style.scss */
+.masthead-title a {
+  color: #505050;
+}
+
+/* line 122, ../../compass/sass/_style.scss */
+.masthead-title small {
+  font-size: 75%;
+  font-weight: 400;
+  color: #c0c0c0;
+  letter-spacing: 0;
 }

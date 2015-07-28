@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+      <title> SSH behine firewall made easy &middot; fz84 </title>
+  
+
+  
+  <link rel="stylesheet" href="http://fanzy.me/css/screen.css">
+
+    
+  
+
+
+
+<link href="/css/themes/blackboard.css" rel="stylesheet" type="text/css">
+<script src="/js/rainbow-custom.min.js"></script>
+<script src="/js/rainbow.linenumbers.min.js"></script>
+
+<link rel="stylesheet" href="/css/code.css">
+
+
+  
+  <link rel="stylesheet" href="http://fanzy.me/font-awesome/css/font-awesome.min.css">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="fz84" />
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="container"> 
+    <div class="sidebar-about">
+      <h1>fz84</h1>
+      <p class="lead">
+       
+        Read, write and do research in systems and security 
+      
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+        <li><a href="/about/"> About </a></li>
+      
+        <li><a href="/post/"> Blogs </a></li>
+      
+    </ul>
+
+    <p class="sidebar-copyright">
+    &copy; 2015. All rights reserved. </p>
+  </div>
+</div>
+
+
+<div class="content container">
+<div class="post">
+  <h1 class="title">SSH behine firewall made easy</h1>
+   
+  <span class="post-date">Tue, Jul 7, 2015</span>
+  
+
+      
+
+<h1 id="settings:f8b878aefe833ac195c03c37c2641d27">Settings</h1>
+
+<p>SSH (Secure Shell) is a must-have tool for many developers who heavily rely on
+SSH to script and manage their remote servers. However, using SSH in reality is often not as handy as I&rsquo;d expect.</p>
+
+<ul>
+<li>For example,
+if the remote server is behind a firewall or NAT (which is often the case when
+you&rsquo;re using servers owned by enterprises or universities), SSH
+requires additional configuration or you&rsquo;d have to setup a VPN prior to SSH.
+VPN is not that bad but it slows down the network quite
+significantly, as least in my case I can feel the latency.</li>
+<li>Even worse, if your remote server sits behind a router, say you have
+a Linux box at home, with no dedicated public IP from you IPS, it&rsquo;s quite not
+easy to get SSH works. You need to configure port forwarding on the
+router, and figure out a way to broadcast the IP address.</li>
+</ul>
+
+<p><img src="../aws-ssh.png" alt="Inconvenient using case of SSH" /></p>
+
+<p>All these inconveniences dwarf the handy nature of SSH. But we&rsquo;ll not
+live with it. Fortunately, SSH is built-in
+with abilities to mitigate this &mdash; reverse SSH, aka SSH tunneling is a powerful
+feature yet some explanation is required to understand how it works and
+how to setup a hassle-free access to your remote server using this technique.</p>
+
+<h1 id="step-by-step-setup:f8b878aefe833ac195c03c37c2641d27">Step-by-step setup</h1>
+
+<p>The setting I&rsquo;m dealing with is illustrated in the following figure. There
+are three parties involved:</p>
+
+<p><img src="../canonical-ssh.png" alt="figure2" /></p>
+
+<ul>
+<li>the remote server, with hostname <code>cs</code></li>
+<li>a cloud server with public IP, with hostname <code>aws-ssh</code></li>
+<li>the client, running ordinary <code>ssh</code> client</li>
+</ul>
+
+<h2 id="setup-reverse-tunnel:f8b878aefe833ac195c03c37c2641d27">setup reverse tunnel</h2>
+
+<p>To setup a reverse tunnel, one need firstly to inform the cloud server of
+the identity of our remote server, the other end-point of this SSH tunnel
+being established. To this end, execute this on the remote server:</p>
+
+<pre><code>ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71
+</code></pre>
+
+<p>This command tell the cloud server (<code>52.10.241.71</code>) to forward all traffic
+going to port 7000 to 22 on the other end of this channel.
+In other words, if connecting to <code>52.10.241.71:7000</code>, all traffic eventually
+arrives at 22 port on remote server. Other parameters are also important,</p>
+
+<ul>
+<li><code>-f</code>: requests ssh to go to background just before command execution</li>
+<li><code>-N</code>: do not execute a remote command</li>
+<li><code>-i</code>: read in <code>aws-key.pem</code> as login the cloud server</li>
+</ul>
+
+<p>To test whether reverse tunnel works, try to connect to <code>localhost:22</code>
+on the AWS Server:</p>
+
+<pre><code>ssh fanz@localhost -p 7000
+</code></pre>
+
+<p>If prompted with login, great, it works!</p>
+
+<h2 id="connect-from-clients:f8b878aefe833ac195c03c37c2641d27">connect from clients</h2>
+
+<p>Okay now we have a reverse tunnel working on the AWS server. Let&rsquo;s move on to
+accept connections from clients. The simplest way for
+a client to connect to the remote server is to chain SSH commands in this way,</p>
+
+<pre><code>ssh -i aws-key.pem ec2-user@52.10.241.71 'ssh fz84@localhost -p 7000'
+</code></pre>
+
+<p>Straightforward as it seems, this method has a major drawback &ndash; it degraded
+security. Owners of the immediate AWS server can witness all traffic if
+he/she wants.</p>
+
+<p>A better approach to this end is to use <code>ProxyCommand</code> feature, introduced in
+OpenSSH v1.2. On the client, add the following to <code>~/.ssh/config</code>:</p>
+
+<pre><code>Host aws-ssh
+      HostName 52.10.241.71
+      User ec2-user
+      IdentityFile aws-key.pem
+
+Host cs
+    User fz48
+    ProxyCommand ssh -W localhost:7000 aws-ssh
+</code></pre>
+
+<ul>
+<li><code>Host</code>: Defines for which host or hosts the configuration section applies.
+The section ends with a new Host section or the end of the file.</li>
+<li><code>User</code>: Defines the username for the SSH connection. Useful if your username
+on the remote host is different from your local username.</li>
+<li><code>HostName</code>: Defines the literal hostname for the remote server. Useful if a
+nickname for the host is used in the Host line.</li>
+<li><code>ProxyCommand</code>: Specifies the proxy command for the connection. This command is
+launched prior to making the connection to Hostname.</li>
+<li><code>-W host:port</code>: Requests that standard input and output on the client be
+forwarded to host on port over the secure channel.</li>
+</ul>
+
+<p>The final mistery left is which command we should use to connect to <code>cs</code>.
+It turn out to be very simple. Just type in <code>ssh cs</code>. It just works!
+By doing this, the ProxyCommand is firstly executed, which forwards <code>STDIN</code>
+and <code>STDOUT</code> to <code>localhost:7000</code>, then login to <code>aws-ssh</code>. Since we already
+have a reverse tunnel &ldquo;listening&rdquo; on port 7000, whatever I/O happens toward
+terminal is forwarded to that port, then the final stop, port 22 on <code>cs</code>.</p>
+
+</div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'FZ84';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</div>
+</body>
+</html>

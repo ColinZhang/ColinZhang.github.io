@@ -11,50 +11,124 @@
     
     <item>
       <title>SSH behine firewall made easy</title>
-      <link>http://fanzy.me/post/SSH-made-easy/</link>
+      <link>http://fanzy.me/post/reverse-ssh-made-easy/SSH-made-easy/</link>
       <pubDate>Tue, 07 Jul 2015 16:58:45 -0400</pubDate>
       
-      <guid>http://fanzy.me/post/SSH-made-easy/</guid>
+      <guid>http://fanzy.me/post/reverse-ssh-made-easy/SSH-made-easy/</guid>
       <description>
 
 &lt;h1 id=&#34;settings:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Settings&lt;/h1&gt;
 
-&lt;pre&gt;&lt;code&gt;(Desktop)---(Intermediate Server)--- || --- (Remote Server)
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;SSH (Secure Shell) is a must-have tool for many developers who heavily rely on
+SSH to script and manage their remote servers. However, using SSH in reality is often not as handy as I&amp;rsquo;d expect.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;For example,
+if the remote server is behind a firewall or NAT (which is often the case when
+you&amp;rsquo;re using servers owned by enterprises or universities), SSH
+requires additional configuration or you&amp;rsquo;d have to setup a VPN prior to SSH.
+VPN is not that bad but it slows down the network quite
+significantly, as least in my case I can feel the latency.&lt;/li&gt;
+&lt;li&gt;Even worse, if your remote server sits behind a router, say you have
+a Linux box at home, with no dedicated public IP from you IPS, it&amp;rsquo;s quite not
+easy to get SSH works. You need to configure port forwarding on the
+router, and figure out a way to broadcast the IP address.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;../aws-ssh.png&#34; alt=&#34;Inconvenient using case of SSH&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;All these inconveniences dwarf the handy nature of SSH. But we&amp;rsquo;ll not
+live with it. Fortunately, SSH is built-in
+with abilities to mitigate this &amp;mdash; reverse SSH, aka SSH tunneling is a powerful
+feature yet some explanation is required to understand how it works and
+how to setup a hassle-free access to your remote server using this technique.&lt;/p&gt;
 
 &lt;h1 id=&#34;step-by-step-setup:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Step-by-step setup&lt;/h1&gt;
 
+&lt;p&gt;The setting I&amp;rsquo;m dealing with is illustrated in the following figure. There
+are three parties involved:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;../canonical-ssh.png&#34; alt=&#34;figure2&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;the remote server, with hostname &lt;code&gt;cs&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;a cloud server with public IP, with hostname &lt;code&gt;aws-ssh&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;the client, running ordinary &lt;code&gt;ssh&lt;/code&gt; client&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h2 id=&#34;setup-reverse-tunnel:f8b878aefe833ac195c03c37c2641d27&#34;&gt;setup reverse tunnel&lt;/h2&gt;
 
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;on CU desktop&lt;/p&gt;
+&lt;p&gt;To setup a reverse tunnel, one need firstly to inform the cloud server of
+the identity of our remote server, the other end-point of this SSH tunnel
+being established. To this end, execute this on the remote server:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;ssh -fN -R 7000:localhost:22 -i aws-key.pem ec2-user@52.10.241.71
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;li&gt;&lt;p&gt;To test whether reverse tunnel works, on AWS Server:&lt;/p&gt;
+&lt;p&gt;This command tell the cloud server (&lt;code&gt;52.10.241.71&lt;/code&gt;) to forward all traffic
+going to port 7000 to 22 on the other end of this channel.
+In other words, if connecting to &lt;code&gt;52.10.241.71:7000&lt;/code&gt;, all traffic eventually
+arrives at 22 port on remote server. Other parameters are also important,&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;ssh fanz@localhost -p 7000 
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;: requests ssh to go to background just before command execution&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-N&lt;/code&gt;: do not execute a remote command&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;: read in &lt;code&gt;aws-key.pem&lt;/code&gt; as login the cloud server&lt;/li&gt;
+&lt;/ul&gt;
 
-&lt;p&gt;If prompted with login. Works.&lt;/p&gt;
+&lt;p&gt;To test whether reverse tunnel works, try to connect to &lt;code&gt;localhost:22&lt;/code&gt;
+on the AWS Server:&lt;/p&gt;
 
-&lt;h2 id=&#34;setup-proxycommand:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Setup &lt;code&gt;ProxyCommand&lt;/code&gt;&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;ssh fanz@localhost -p 7000
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;on Laptop, add the following to ~/.ssh/config&lt;/p&gt;
+&lt;p&gt;If prompted with login, great, it works!&lt;/p&gt;
+
+&lt;h2 id=&#34;connect-from-clients:f8b878aefe833ac195c03c37c2641d27&#34;&gt;connect from clients&lt;/h2&gt;
+
+&lt;p&gt;Okay now we have a reverse tunnel working on the AWS server. Let&amp;rsquo;s move on to
+accept connections from clients. The simplest way for
+a client to connect to the remote server is to chain SSH commands in this way,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh -i aws-key.pem ec2-user@52.10.241.71 &#39;ssh fz84@localhost -p 7000&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Straightforward as it seems, this method has a major drawback &amp;ndash; it degraded
+security. Owners of the immediate AWS server can witness all traffic if
+he/she wants.&lt;/p&gt;
+
+&lt;p&gt;A better approach to this end is to use &lt;code&gt;ProxyCommand&lt;/code&gt; feature, introduced in
+OpenSSH v1.2. On the client, add the following to &lt;code&gt;~/.ssh/config&lt;/code&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;Host aws-ssh
-    HostName 52.10.241.71
-    User ec2-user
-    IdentityFile ~/Dropbox/keys/Fan.pem
+      HostName 52.10.241.71
+      User ec2-user
+      IdentityFile aws-key.pem
 
 Host cs
-    User fanz
+    User fz48
     ProxyCommand ssh -W localhost:7000 aws-ssh
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then, simply try &lt;code&gt;ssh cs&lt;/code&gt;. Should works!&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Host&lt;/code&gt;: Defines for which host or hosts the configuration section applies.
+The section ends with a new Host section or the end of the file.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;User&lt;/code&gt;: Defines the username for the SSH connection. Useful if your username
+on the remote host is different from your local username.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HostName&lt;/code&gt;: Defines the literal hostname for the remote server. Useful if a
+nickname for the host is used in the Host line.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ProxyCommand&lt;/code&gt;: Specifies the proxy command for the connection. This command is
+launched prior to making the connection to Hostname.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-W host:port&lt;/code&gt;: Requests that standard input and output on the client be
+forwarded to host on port over the secure channel.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The final mistery left is which command we should use to connect to &lt;code&gt;cs&lt;/code&gt;.
+It turn out to be very simple. Just type in &lt;code&gt;ssh cs&lt;/code&gt;. It just works!
+By doing this, the ProxyCommand is firstly executed, which forwards &lt;code&gt;STDIN&lt;/code&gt;
+and &lt;code&gt;STDOUT&lt;/code&gt; to &lt;code&gt;localhost:7000&lt;/code&gt;, then login to &lt;code&gt;aws-ssh&lt;/code&gt;. Since we already
+have a reverse tunnel &amp;ldquo;listening&amp;rdquo; on port 7000, whatever I/O happens toward
+terminal is forwarded to that port, then the final stop, port 22 on &lt;code&gt;cs&lt;/code&gt;.&lt;/p&gt;
 </description>
     </item>
     
