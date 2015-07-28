@@ -20,7 +20,8 @@
 &lt;h1 id=&#34;settings:f8b878aefe833ac195c03c37c2641d27&#34;&gt;Settings&lt;/h1&gt;
 
 &lt;p&gt;SSH (Secure Shell) is a must-have tool for many developers who heavily rely on
-SSH to script and manage their remote servers. However, using SSH in reality is often not as handy as I&amp;rsquo;d expect.&lt;/p&gt;
+SSH to script and manage their remote servers. However, using SSH in reality is
+often not as handy as I&amp;rsquo;d expect.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;For example,
@@ -35,7 +36,7 @@ easy to get SSH works. You need to configure port forwarding on the
 router, and figure out a way to broadcast the IP address.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;img src=&#34;../aws-ssh.png&#34; alt=&#34;Inconvenient using case of SSH&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../canonical-ssh.png&#34; alt=&#34;Inconvenient using case of SSH&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;All these inconveniences dwarf the handy nature of SSH. But we&amp;rsquo;ll not
 live with it. Fortunately, SSH is built-in
@@ -48,7 +49,7 @@ how to setup a hassle-free access to your remote server using this technique.&lt
 &lt;p&gt;The setting I&amp;rsquo;m dealing with is illustrated in the following figure. There
 are three parties involved:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;../canonical-ssh.png&#34; alt=&#34;figure2&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../cloud-ssh.png&#34; alt=&#34;figure2&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;the remote server, with hostname &lt;code&gt;cs&lt;/code&gt;&lt;/li&gt;
