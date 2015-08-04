@@ -48,7 +48,7 @@ how to setup a hassle-free access to your remote server using this technique.&lt
 &lt;p&gt;The setting I&amp;rsquo;m dealing with is illustrated in the following figure. There
 are three parties involved:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;../canonical-ssh.png&#34; alt=&#34;figure2&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../cano-ssh.png&#34; alt=&#34;figure2&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;the remote server, with hostname &lt;code&gt;cs&lt;/code&gt;&lt;/li&gt;

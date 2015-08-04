@@ -531,13 +531,13 @@ a.sidebar-nav-item:focus {
   padding: 2rem;
 }
 
+/* sidebar ON THE LEFT */
 @media (min-width: 720px) {
-  /* line 13, ../../compass/sass/_container.scss */
+  /* line 15, ../../compass/sass/_container.scss */
   .content {
     max-width: 38rem;
     margin-left: 18rem;
-    /* margin-right: 2rem;
-    */
+    padding: 2rem 4rem;
   }
 }
 /* Code */
@@ -812,9 +812,9 @@ blockquote p:last-child {
 /* line 46, ../../compass/sass/_style.scss */
 img {
   display: block;
-  margin: 0 0 1rem;
-  border-radius: 5px;
-  max-width: 100%;
+  margin: 1rem auto;
+  border: 1px solid #e5e5e5;
+  max-width: 90%;
 }
 
 /* Tables */
