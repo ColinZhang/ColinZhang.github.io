@@ -517,25 +517,26 @@ a.sidebar-nav-item:focus {
     margin: 0;
   }
 }
-/* line 2, ../../compass/sass/_container.scss */
+/* line 3, ../../compass/sass/_container.scss */
 .container {
-  max-width: 40rem;
+  max-width: 60rem;
   padding-left: 1rem;
   padding-right: 1rem;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* line 9, ../../compass/sass/_container.scss */
+/* line 10, ../../compass/sass/_container.scss */
 .content {
   padding: 2rem;
 }
 
 /* sidebar ON THE LEFT */
 @media (min-width: 720px) {
-  /* line 15, ../../compass/sass/_container.scss */
+  /* line 16, ../../compass/sass/_container.scss */
   .content {
-    max-width: 38rem;
+    max-width: 50rem;
+    min-width: 40rem;
     margin-left: 18rem;
     padding: 2rem 4rem;
   }

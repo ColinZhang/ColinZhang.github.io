@@ -84,7 +84,7 @@ recover the exact python environment, I just</p>
 If <code>virtualenv</code> is used, probably <code>--user</code> is not necessary neither.
 But mostly I find <code>virtualenv</code> actually an overkill and just use vanilla
 pip instead. I use <code>--user</code> so as pip will not mess up with default packages
-installed by Mac OS (<code>--system</code>).</p>
+installed by Mac OS (on the othe hand, <code>--system</code> will).</p>
 
 <p>Another tool I find useful in automating this process is <code>pipreqs</code>, which
 can analyze <code>import</code> in your project and extract them into
@@ -93,6 +93,12 @@ requirements files.</p>
 <pre><code>pip install pipreqs
 pipreqs /path/to/project
 </code></pre>
+
+<p>For completeness, another tangentially relevant choice is <code>pip freeze</code>,
+which lists all installed packages on your machine (you can filter items
+by appending <code>--user</code> and/or other filters to <code>freeze</code> command), but maybe
+not all of them are used in your project.
+ear</p>
 
 </div>
 

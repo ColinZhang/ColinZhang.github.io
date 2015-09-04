@@ -31,7 +31,7 @@ recover the exact python environment, I just&lt;/p&gt;
 If &lt;code&gt;virtualenv&lt;/code&gt; is used, probably &lt;code&gt;--user&lt;/code&gt; is not necessary neither.
 But mostly I find &lt;code&gt;virtualenv&lt;/code&gt; actually an overkill and just use vanilla
 pip instead. I use &lt;code&gt;--user&lt;/code&gt; so as pip will not mess up with default packages
-installed by Mac OS (&lt;code&gt;--system&lt;/code&gt;).&lt;/p&gt;
+installed by Mac OS (on the othe hand, &lt;code&gt;--system&lt;/code&gt; will).&lt;/p&gt;
 
 &lt;p&gt;Another tool I find useful in automating this process is &lt;code&gt;pipreqs&lt;/code&gt;, which
 can analyze &lt;code&gt;import&lt;/code&gt; in your project and extract them into
@@ -40,6 +40,12 @@ requirements files.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;pip install pipreqs
 pipreqs /path/to/project
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For completeness, another tangentially relevant choice is &lt;code&gt;pip freeze&lt;/code&gt;,
+which lists all installed packages on your machine (you can filter items
+by appending &lt;code&gt;--user&lt;/code&gt; and/or other filters to &lt;code&gt;freeze&lt;/code&gt; command), but maybe
+not all of them are used in your project.
+ear&lt;/p&gt;
 </description>
     </item>
     
