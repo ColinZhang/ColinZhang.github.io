@@ -6,8 +6,79 @@
     <description>Recent content in Blog on fz84</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 03 Sep 2015 22:15:11 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 04 Sep 2015 10:53:13 -0400</lastBuildDate>
     <atom:link href="http://fanzy.me/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Use Amazon Machine Learning in Python</title>
+      <link>http://fanzy.me/post/boto-setup/</link>
+      <pubDate>Fri, 04 Sep 2015 10:53:13 -0400</pubDate>
+      
+      <guid>http://fanzy.me/post/boto-setup/</guid>
+      <description>
+
+&lt;h2 id=&#34;aws-credentials:b2c9726d84ab8dac35e1b3504d6712b5&#34;&gt;AWS Credentials&lt;/h2&gt;
+
+&lt;p&gt;Appropriate credentials are required to access aws service API. Amazon Web Service
+differentiates two types of credentials: root credentials and IAM credentials.
+Root credentials are associated with aws accounts and have full access to all
+resources. A maximum of two keys are allowed at a time. On the other end of
+spectrum, IAM (Identity and Authentication Management) credentials are analogous
+to user accounts in a Unix system, which are created by a root account and their
+capabilities can be dynamically managed. AWS advocates the usage of IAM
+credentials for security consideration. Of course, one can still create and use
+root credentials, however, if they will.&lt;/p&gt;
+
+&lt;p&gt;To access aws API through boto, one needs proper credentials set up. The first
+step of doing this is to create a user (if not already created) and download the
+access key.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;To manage IAM credentials, use IAM console.&lt;/li&gt;
+&lt;li&gt;To manage root credentials, see &lt;a href=&#34;http://docs.aws.amazon.com/general/latest/gr/getting-aws-sec-creds.html&#34;&gt;this&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are multiple ways to configure credential file for Boto&amp;rsquo;s usage. For
+instance, put the credential file downloaded from IAM at &lt;code&gt;~/.aws/credentials&lt;/code&gt;,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[default]
+aws_access_key_id = YOUR_ACCESS_KEY
+aws_secret_access_key = YOUR_SECRET_KEY
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Not sure if it&amp;rsquo;s mandatory but Boto document suggest doing so&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[default]
+region=us-east-1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;install-boto:b2c9726d84ab8dac35e1b3504d6712b5&#34;&gt;install Boto&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;pip install boto3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If for current user only, append &lt;code&gt;--user&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;using-boto3:b2c9726d84ab8dac35e1b3504d6712b5&#34;&gt;Using Boto3&lt;/h2&gt;
+
+&lt;p&gt;To verify your credentials and other configurations are correct, run a minimal
+boto3 script this like,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import boto3
+s3 = boto3.resource(&#39;s3&#39;)
+# Print out bucket names
+for bucket in s3.buckets.all():
+    print(bucket.name)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;amazon-machine-learning-api:b2c9726d84ab8dac35e1b3504d6712b5&#34;&gt;Amazon Machine Learning API&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import boto3
+
+client = boto3.client(&#39;machinelearning&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Automatically generate requirements file for Python project</title>
