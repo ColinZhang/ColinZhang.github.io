@@ -1,5 +1,5 @@
 @import url("//fonts.googleapis.com/css?family=Kreon|Patrick%20Hand");
-/* line 5, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 5, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -21,74 +21,74 @@ time, mark, audio, video {
   vertical-align: baseline;
 }
 
-/* line 22, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 22, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 html {
   line-height: 1;
 }
 
-/* line 24, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 24, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 ol, ul {
   list-style: none;
 }
 
-/* line 26, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 26, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-/* line 28, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 28, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 caption, th, td {
   text-align: left;
   font-weight: normal;
   vertical-align: middle;
 }
 
-/* line 30, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 30, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 q, blockquote {
   quotes: none;
 }
-/* line 103, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 103, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 q:before, q:after, blockquote:before, blockquote:after {
   content: "";
   content: none;
 }
 
-/* line 32, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 32, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 a img {
   border: none;
 }
 
-/* line 116, ../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+/* line 116, ../../../../../../.gem/ruby/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
 article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
   display: block;
 }
 
-/* line 9, ../../compass/sass/_typography.scss */
+/* line 10, ../../compass/sass/_typography.scss */
 html {
   font-family: "Kreon", serif;
   line-height: 1.5;
 }
 
-/* line 14, ../../compass/sass/_typography.scss */
+/* line 15, ../../compass/sass/_typography.scss */
 body {
   color: #515151;
   background-color: #fff;
 }
 
-/* line 18, ../../compass/sass/_typography.scss */
+/* line 19, ../../compass/sass/_typography.scss */
 a {
   color: #268bd2;
   text-decoration: none;
 }
 
-/* line 22, ../../compass/sass/_typography.scss */
+/* line 23, ../../compass/sass/_typography.scss */
 a:hover,
 a:focus {
   text-decoration: underline;
 }
 
-/* line 27, ../../compass/sass/_typography.scss */
+/* line 28, ../../compass/sass/_typography.scss */
 strong {
   color: #303030;
 }
@@ -97,154 +97,154 @@ strong {
 Vertical Rhythm from:
 http://www.sitepoint.com/using-sass-build-custom-type-scale-vertical-rhythm/
 */
-/* line 88, ../../compass/sass/_typography.scss */
+/* line 89, ../../compass/sass/_typography.scss */
 p, li {
   font-size: 14px;
   line-height: 1.3;
 }
 
-/* line 88, ../../compass/sass/_typography.scss */
+/* line 89, ../../compass/sass/_typography.scss */
 blockquote {
   font-size: 16.8px;
   line-height: 1.08333;
 }
 
-/* line 88, ../../compass/sass/_typography.scss */
+/* line 89, ../../compass/sass/_typography.scss */
 h3 {
   font-size: 20.16px;
   line-height: 1.80556;
 }
 
-/* line 88, ../../compass/sass/_typography.scss */
+/* line 89, ../../compass/sass/_typography.scss */
 h2 {
   font-size: 24.192px;
   line-height: 1.50463;
 }
 
-/* line 88, ../../compass/sass/_typography.scss */
+/* line 89, ../../compass/sass/_typography.scss */
 h1 {
   font-size: 29.0304px;
   line-height: 1.25386;
 }
 
-/* line 88, ../../compass/sass/_typography.scss */
+/* line 89, ../../compass/sass/_typography.scss */
 .hero {
   font-size: 34.83648px;
   line-height: 1.04488;
 }
 
 @media (min-width: 480px) {
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   p, li {
     font-size: 18px;
     line-height: 1.3;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   blockquote {
     font-size: 21.6px;
     line-height: 1.08333;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h3 {
     font-size: 25.92px;
     line-height: 1.80556;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h2 {
     font-size: 31.104px;
     line-height: 1.50463;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h1 {
     font-size: 37.3248px;
     line-height: 1.25386;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   .hero {
     font-size: 44.78976px;
     line-height: 1.04488;
   }
 }
 @media (min-width: 960px) {
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   p, li {
     font-size: 20px;
     line-height: 1.4;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   blockquote {
     font-size: 24px;
     line-height: 1.16667;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h3 {
     font-size: 28.8px;
     line-height: 1.94444;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h2 {
     font-size: 34.56px;
     line-height: 1.62037;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h1 {
     font-size: 41.472px;
     line-height: 1.35031;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   .hero {
     font-size: 49.7664px;
     line-height: 1.12526;
   }
 }
 @media (min-width: 1280px) {
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   p, li {
     font-size: 22px;
     line-height: 1.5;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   blockquote {
     font-size: 26.4px;
     line-height: 1.25;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h3 {
     font-size: 31.68px;
     line-height: 1.04167;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h2 {
     font-size: 38.016px;
     line-height: 1.73611;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   h1 {
     font-size: 45.6192px;
     line-height: 1.44676;
   }
 
-  /* line 88, ../../compass/sass/_typography.scss */
+  /* line 89, ../../compass/sass/_typography.scss */
   .hero {
     font-size: 54.74304px;
     line-height: 1.20563;
   }
 }
-/* line 113, ../../compass/sass/_typography.scss */
+/* line 114, ../../compass/sass/_typography.scss */
 h1,
 h2,
 h3,
@@ -257,19 +257,19 @@ h6 {
   font-family: "Patrick Hand", sans-serif;
 }
 
-/* line 124, ../../compass/sass/_typography.scss */
+/* line 125, ../../compass/sass/_typography.scss */
 h5, h4, p {
   margin-top: .5rem;
   margin-bottom: .5rem;
 }
 
-/* line 128, ../../compass/sass/_typography.scss */
+/* line 129, ../../compass/sass/_typography.scss */
 h3 {
   margin-top: .75rem;
   margin-bottom: .5rem;
 }
 
-/* line 132, ../../compass/sass/_typography.scss */
+/* line 133, ../../compass/sass/_typography.scss */
 h2, h1 {
   margin-top: 1.0rem;
   margin-bottom: .5rem;
@@ -517,26 +517,25 @@ a.sidebar-nav-item:focus {
     margin: 0;
   }
 }
-/* line 3, ../../compass/sass/_container.scss */
+/* line 2, ../../compass/sass/_container.scss */
 .container {
-  max-width: 60rem;
+  max-width: 40rem;
   padding-left: 1rem;
   padding-right: 1rem;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* line 10, ../../compass/sass/_container.scss */
+/* line 9, ../../compass/sass/_container.scss */
 .content {
   padding: 2rem;
 }
 
 /* sidebar ON THE LEFT */
 @media (min-width: 720px) {
-  /* line 16, ../../compass/sass/_container.scss */
+  /* line 15, ../../compass/sass/_container.scss */
   .content {
-    max-width: 50rem;
-    min-width: 40rem;
+    max-width: 38rem;
     margin-left: 18rem;
     padding: 2rem 4rem;
   }
