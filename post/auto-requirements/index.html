@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   
-      <title> I just get a new blog &middot; fz84 </title>
+      <title> Automatically generate requirements file for Python project &middot; fz84 </title>
   
 
   
@@ -63,12 +63,42 @@
 
 <div class="content container">
 <div class="post">
-  <h1 class="title">I just get a new blog</h1>
+  <h1 class="title">Automatically generate requirements file for Python project</h1>
    
-  <span class="post-date">Thu, Mar 12, 2015</span>
+  <span class="post-date">Thu, Sep 3, 2015</span>
   
 
-      <p>Moving from Pelican to <a href="http://gohugo.io">Hugo</a> is satisfatory and easy.</p>
+      <p>When you need to move your Python project around, say, to test under the
+production environment, or to run a heavy load script on your powerful cloud
+rack, you would better duplicate the exact development environment to avoid
+compatibility issues.</p>
+
+<p>My practice for doing this migration is to use <code>pip</code> as package management
+tool and use <code>requirements.txt</code> file to document dependencies. Then, to
+recover the exact python environment, I just</p>
+
+<pre><code>pip install --user -r requirements.txt
+</code></pre>
+
+<p>Note that <code>--user</code> is used so <code>sudo</code> is not required.
+If <code>virtualenv</code> is used, probably <code>--user</code> is not necessary neither.
+But mostly I find <code>virtualenv</code> actually an overkill and just use vanilla
+pip instead. I use <code>--user</code> so as pip will not mess up with default packages
+installed by Mac OS (on the othe hand, <code>--system</code> will).</p>
+
+<p>Another tool I find useful in automating this process is <code>pipreqs</code>, which
+can analyze <code>import</code> in your project and extract them into
+requirements files.</p>
+
+<pre><code>pip install pipreqs
+pipreqs /path/to/project
+</code></pre>
+
+<p>For completeness, another tangentially relevant choice is <code>pip freeze</code>,
+which lists all installed packages on your machine (you can filter items
+by appending <code>--user</code> and/or other filters to <code>freeze</code> command), but maybe
+not all of them are used in your project.
+ear</p>
 
 </div>
 
