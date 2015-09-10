@@ -545,7 +545,6 @@ a.sidebar-nav-item:focus {
   /* line 16, ../../compass/sass/_container.scss */
   .content {
     max-width: 50rem;
-    min-width: 40rem;
     margin-left: 18rem;
     padding: 2rem 4rem;
   }
@@ -757,6 +756,33 @@ a.pagination-item:hover {
 img[alt=email] {
   display: inline;
   vertical-align: middle;
+}
+
+/* line 6, ../../compass/sass/_custom.scss */
+time.post-list {
+  display: inline-block;
+  min-width: 4rem;
+}
+
+/* Outer div */
+/* line 12, ../../compass/sass/_custom.scss */
+span.datetime {
+  width: 1.5rem;
+  vertical-align: middle;
+}
+
+/* line 19, ../../compass/sass/_custom.scss */
+span.datetime p {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  text-align: center;
+  font-size: x-small;
+}
+
+/* line 27, ../../compass/sass/_custom.scss */
+span.datetime p:first-child {
+  text-transform: uppercase;
 }
 
 /* Lists */
