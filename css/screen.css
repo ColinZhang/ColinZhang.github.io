@@ -99,37 +99,37 @@ http://www.sitepoint.com/using-sass-build-custom-type-scale-vertical-rhythm/
 */
 /* line 88, ../../compass/sass/_typography.scss */
 p, li {
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.3;
 }
 
 /* line 88, ../../compass/sass/_typography.scss */
 blockquote {
-  font-size: 14.4px;
+  font-size: 19.2px;
   line-height: 1.08333;
 }
 
 /* line 88, ../../compass/sass/_typography.scss */
 h3 {
-  font-size: 17.28px;
+  font-size: 23.04px;
   line-height: 1.80556;
 }
 
 /* line 88, ../../compass/sass/_typography.scss */
 h2 {
-  font-size: 20.736px;
+  font-size: 27.648px;
   line-height: 1.50463;
 }
 
 /* line 88, ../../compass/sass/_typography.scss */
 h1 {
-  font-size: 24.8832px;
+  font-size: 33.1776px;
   line-height: 1.25386;
 }
 
 /* line 88, ../../compass/sass/_typography.scss */
 .hero {
-  font-size: 29.85984px;
+  font-size: 39.81312px;
   line-height: 1.04488;
 }
 
