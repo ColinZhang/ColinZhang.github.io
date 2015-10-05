@@ -643,24 +643,14 @@ quotation&lt;/strong&gt; later.&lt;/p&gt;
     </item>
     
     <item>
-      <title>About</title>
-      <link>http://fanzy.me/about/</link>
+      <title>CV</title>
+      <link>http://fanzy.me/CV/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://fanzy.me/about/</guid>
-      <description>
+      <guid>http://fanzy.me/CV/</guid>
+      <description>&lt;p&gt;Coming soon.&lt;/p&gt;
 
-&lt;p&gt;This blog collects random thoughts occurring to me while I code, think or read other guys&amp;rsquo; blogs. Sometimes I also write down practical solutions to intriguing problems I met and struggled through.&lt;/p&gt;
-
-&lt;p&gt;Most of my blogs will be about system and its security. My ultimate goal is to disseminate security facts, rectify misunderstandings and promote tools with which people can defend themselves from vulnerabilities. For more information.&lt;/p&gt;
-
-&lt;h1 id=&#34;me:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Me&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Email: &lt;img src=&#34;../images/email.png&#34; alt=&#34;email&#34; /&gt;&lt;/li&gt;
-&lt;li&gt;Github: bl4ck5un&lt;/li&gt;
-&lt;li&gt;PGP fingerprint: &lt;code&gt;2B1B EE81 511C 049B 8FBA  3D20 79A9 9BA9 D60B 237C&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Please contact me for my latest CV/Resume.&lt;/p&gt;
 </description>
     </item>
     

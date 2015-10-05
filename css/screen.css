@@ -271,30 +271,14 @@ h2, h1 {
   margin: 0;
 }
 
-/* line 21, ../../compass/sass/_sidebar.scss */
-.sidebar-nav-item {
-  display: block;
-}
-
 /* line 24, ../../compass/sass/_sidebar.scss */
-a.sidebar-nav-item:hover,
-a.sidebar-nav-item:focus {
-  text-decoration: underline;
-}
-
-/* line 28, ../../compass/sass/_sidebar.scss */
-.sidebar-nav-item.active {
-  font-weight: bold;
-}
-
-/* line 32, ../../compass/sass/_sidebar.scss */
 #sidebar-nav {
   padding-left: 0;
   list-style: none;
   margin: 0.5rem;
   padding: 0 0;
 }
-/* line 37, ../../compass/sass/_sidebar.scss */
+/* line 29, ../../compass/sass/_sidebar.scss */
 #sidebar-nav li {
   display: inline;
   padding-left: 2px;
@@ -302,23 +286,23 @@ a.sidebar-nav-item:focus {
   padding-top: 0;
   padding-bottom: 0;
 }
-/* line 44, ../../compass/sass/_sidebar.scss */
+/* line 36, ../../compass/sass/_sidebar.scss */
 #sidebar-nav li::after {
   content: ",";
 }
 
-/* line 50, ../../compass/sass/_sidebar.scss */
+/* line 42, ../../compass/sass/_sidebar.scss */
 #sidebar-copyright {
   padding: 0;
   margin: 0;
   display: none;
 }
 
-/* line 56, ../../compass/sass/_sidebar.scss */
+/* line 48, ../../compass/sass/_sidebar.scss */
 footer {
   font-size: .8rem;
 }
-/* line 58, ../../compass/sass/_sidebar.scss */
+/* line 50, ../../compass/sass/_sidebar.scss */
 footer div {
   margin: .5rem auto;
   text-align: center;
@@ -718,117 +702,117 @@ footer {
 
 /* line 44, ../../compass/sass/_theme.scss */
 a {
-  color: #515151;
+  color: #888;
+  transition: color 0.2s ease;
   text-decoration: none;
 }
 
-/* line 48, ../../compass/sass/_theme.scss */
-a:hover,
-a:focus {
-  text-decoration: underline;
+/* line 49, ../../compass/sass/_theme.scss */
+a:hover {
+  color: #515151;
 }
 
-/* line 53, ../../compass/sass/_theme.scss */
+/* line 56, ../../compass/sass/_theme.scss */
 strong {
   color: #303030;
 }
 
-/* line 57, ../../compass/sass/_theme.scss */
+/* line 60, ../../compass/sass/_theme.scss */
 .container {
   background-color: #fff;
 }
 
 /* Red */
-/* line 62, ../../compass/sass/_theme.scss */
+/* line 65, ../../compass/sass/_theme.scss */
 .theme-base-08 .sidebar {
   background-color: #ac4142;
 }
 
-/* line 65, ../../compass/sass/_theme.scss */
+/* line 68, ../../compass/sass/_theme.scss */
 .theme-base-08 .content a,
 .theme-base-08 .related-posts li a:hover {
   color: #ac4142;
 }
 
 /* Orange */
-/* line 71, ../../compass/sass/_theme.scss */
+/* line 74, ../../compass/sass/_theme.scss */
 .theme-base-09 .sidebar {
   background-color: #d28445;
 }
 
-/* line 74, ../../compass/sass/_theme.scss */
+/* line 77, ../../compass/sass/_theme.scss */
 .theme-base-09 .content a,
 .theme-base-09 .related-posts li a:hover {
   color: #d28445;
 }
 
 /* Yellow */
-/* line 80, ../../compass/sass/_theme.scss */
+/* line 83, ../../compass/sass/_theme.scss */
 .theme-base-0a .sidebar {
   background-color: #f4bf75;
 }
 
-/* line 83, ../../compass/sass/_theme.scss */
+/* line 86, ../../compass/sass/_theme.scss */
 .theme-base-0a .content a,
 .theme-base-0a .related-posts li a:hover {
   color: #f4bf75;
 }
 
 /* Green */
-/* line 89, ../../compass/sass/_theme.scss */
+/* line 92, ../../compass/sass/_theme.scss */
 .theme-base-0b .sidebar {
   background-color: #90a959;
 }
 
-/* line 92, ../../compass/sass/_theme.scss */
+/* line 95, ../../compass/sass/_theme.scss */
 .theme-base-0b .content a,
 .theme-base-0b .related-posts li a:hover {
   color: #90a959;
 }
 
 /* Cyan */
-/* line 98, ../../compass/sass/_theme.scss */
+/* line 101, ../../compass/sass/_theme.scss */
 .theme-base-0c .sidebar {
   background-color: #75b5aa;
 }
 
-/* line 101, ../../compass/sass/_theme.scss */
+/* line 104, ../../compass/sass/_theme.scss */
 .theme-base-0c .content a,
 .theme-base-0c .related-posts li a:hover {
   color: #75b5aa;
 }
 
 /* Blue */
-/* line 107, ../../compass/sass/_theme.scss */
+/* line 110, ../../compass/sass/_theme.scss */
 .theme-base-0d .sidebar {
   background-color: #6a9fb5;
 }
 
-/* line 110, ../../compass/sass/_theme.scss */
+/* line 113, ../../compass/sass/_theme.scss */
 .theme-base-0d .content a,
 .theme-base-0d .related-posts li a:hover {
   color: #6a9fb5;
 }
 
 /* Magenta */
-/* line 116, ../../compass/sass/_theme.scss */
+/* line 119, ../../compass/sass/_theme.scss */
 .theme-base-0e .sidebar {
   background-color: #aa759f;
 }
 
-/* line 119, ../../compass/sass/_theme.scss */
+/* line 122, ../../compass/sass/_theme.scss */
 .theme-base-0e .content a,
 .theme-base-0e .related-posts li a:hover {
   color: #aa759f;
 }
 
 /* Brown */
-/* line 125, ../../compass/sass/_theme.scss */
+/* line 128, ../../compass/sass/_theme.scss */
 .theme-base-0f .sidebar {
   background-color: #8f5536;
 }
 
-/* line 128, ../../compass/sass/_theme.scss */
+/* line 131, ../../compass/sass/_theme.scss */
 .theme-base-0f .content a,
 .theme-base-0f .related-posts li a:hover {
   color: #8f5536;
